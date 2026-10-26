@@ -1423,5 +1423,7 @@ setInterval(()=>{if(Date.now()>=nextRefresh)refreshNow();else if(refreshPending&
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&FETCHED_AT&&Date.now()-FETCHED_AT>REFRESH_MS)refreshNow()});
 setInterval(()=>{if(SOURCE.live)renderSource()},30*1000);
 </script>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
