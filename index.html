@@ -171,7 +171,7 @@ a{color:var(--accent)}
 .gcard .gb b{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gcard .gb span{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gcard .gb .co{color:var(--conc)}
-.badge{position:absolute;top:6px;left:6px;background:rgba(12,29,36,.85);color:var(--fg);font-size:11px;font-family:var(--font-mono);padding:2px 6px;border-radius:4px;border:1px solid var(--line)}
+.badge{position:absolute;z-index:2;top:6px;left:6px;background:rgba(12,29,36,.85);color:var(--fg);font-size:11px;font-family:var(--font-mono);padding:2px 6px;border-radius:4px;border:1px solid var(--line)}
 .phpin{width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:8px;border:2px solid var(--accent);overflow:hidden;background:var(--panel);box-shadow:0 4px 14px rgba(0,0,0,.5);position:relative;cursor:pointer}
 .phpin img{width:100%;height:100%;object-fit:cover;display:block}
 .phpin b{position:absolute;right:2px;bottom:2px;background:var(--accent);color:#1a0d04;font-size:10px;font-weight:700;padding:0 4px;border-radius:3px;font-family:var(--font-mono)}
@@ -582,6 +582,7 @@ function imgDay(d){let day=isoDay(d.ms);if(new Date(d.ms).getUTCHours()>=12)day=
 function citraUrl(lat,lon,day,size){return "/api/citra?lat="+lat.toFixed(2)+"&lon="+lon.toFixed(2)+"&date="+day+"&size="+size}
 function fmtIsoDay(iso){const d=new Date(iso+"T00:00:00Z");return d.getUTCDate()+" "+BULAN[d.getUTCMonth()].slice(0,3)+" "+d.getUTCFullYear()}
 function shotHtml(lat,lon,day,size,badge){return '<div class="shot">'+(badge?'<span class="badge">'+badge+'</span>':'')+'<img loading="lazy" alt="Foto satelit area titik panas, '+fmtIsoDay(day)+'" src="'+citraUrl(lat,lon,day,size)+'" onerror="this.nextSibling.textContent=\'Foto belum tersedia untuk tanggal ini\';this.remove()"><div class="ph-empty" aria-hidden="true">Memuat foto satelit…</div></div>'}
+function placeName(d){if(d.town&&d.townKm<120)return d.town[1];if(d.town&&d.townKm<400)return "± "+Math.round(d.townKm)+" km dari "+d.town[0];return d.prov||"Koordinat "+d.lat.toFixed(2)+", "+d.lon.toFixed(2)}
 function photoClusters(list){
   const g=new Map();
   list.forEach(d=>{const k=Math.round(d.lat/.3)+":"+Math.round(d.lon/.3);let c=g.get(k);if(!c){c={n:0,frp:0,top:d,latest:d,comps:{}};g.set(k,c)}c.n++;c.frp+=d.frp;if(d.frp>c.top.frp)c.top=d;if(d.ms>c.latest.ms)c.latest=d;if(d.conc)c.comps[d.conc.company]=(c.comps[d.conc.company]||0)+1});
@@ -600,7 +601,7 @@ function renderPhotos(){
   const days=cl.map(c=>imgDay(c.top));
   $("galDate").textContent="citra "+fmtIsoDay(days.reduce((a,b)=>a>b?a:b));
   gal.innerHTML=cl.map((c,i)=>{const d=c.top,day=days[i];const co=Object.keys(c.comps).sort((a,b)=>c.comps[b]-c.comps[a])[0];
-    return '<button type="button" class="gcard" data-id="'+d.id+'">'+shotHtml(d.lat,d.lon,day,320,c.n+" titik")+'<span class="gb"><b>'+esc(d.town&&d.townKm<120?d.town[1]:(d.prov||"Lepas pantai"))+'</b><span>'+esc(d.prov||"")+' · terbaru '+fmtTime(c.latest.ms,c.latest.off)+' '+c.latest.zn+'</span>'+(co?'<span class="co">Konsesi: '+esc(co)+'</span>':'')+'</span></button>'}).join("");
+    return '<button type="button" class="gcard" data-id="'+d.id+'">'+shotHtml(d.lat,d.lon,day,320,c.n+" titik")+'<span class="gb"><b>'+esc(placeName(d))+'</b><span>'+esc(d.prov||(d.lat.toFixed(2)+", "+d.lon.toFixed(2)))+' · terbaru '+fmtTime(c.latest.ms,c.latest.off)+' '+c.latest.zn+'</span>'+(co?'<span class="co">Konsesi: '+esc(co)+'</span>':'')+'</span></button>'}).join("");
   if(showPhotos)cl.forEach((c,i)=>{const d=c.top;
     L.marker([d.lat,d.lon],{keyboard:false,zIndexOffset:1000,icon:L.divIcon({className:"",iconSize:[0,0],html:'<div class="phpin" title="Foto satelit '+fmtIsoDay(days[i])+'"><img loading="lazy" alt="" src="'+citraUrl(d.lat,d.lon,days[i],160)+'"><b>'+c.n+'</b></div>'})}).on("click",()=>select(d.id,true)).addTo(photoLayer)});
 }
