@@ -1,0 +1,7 @@
+{
+  "name": "pantau-karhutla",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Peta titik panas karhutla Indonesia dengan data NASA FIRMS dan konsesi perusahaan",
+  "engines": { "node": ">=18" }
+}
