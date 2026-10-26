@@ -41,8 +41,19 @@ async function handler(req, res) {
     return;
   }
   try {
-    const results = await Promise.allSettled(SOURCES.map(async src => {
-      const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${encodeURIComponent(key)}/${src}/${AREA}/${DAYS}`;
+    // FIRMS NRT accepts at most 5 days per request: split longer ranges into chunks.
+    const chunks = [];
+    if (DAYS <= 5) chunks.push({ range: DAYS, date: null });
+    else {
+      chunks.push({ range: 5, date: null }); // most recent 5 days (today-4 .. today)
+      const older = DAYS - 5;
+      const start = new Date(Date.now() - (DAYS - 1) * 864e5).toISOString().slice(0, 10);
+      chunks.push({ range: older, date: start });
+    }
+    const jobs = [];
+    for (const src of SOURCES) for (const c of chunks) jobs.push({ src, c });
+    const results = await Promise.allSettled(jobs.map(async ({ src, c }) => {
+      const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${encodeURIComponent(key)}/${src}/${AREA}/${c.range}` + (c.date ? `/${c.date}` : "");
       const r = await fetch(url, { headers: { "User-Agent": "pantau-karhutla" } });
       const text = await r.text();
       if (!r.ok) throw new Error(src + " HTTP " + r.status + ": " + text.slice(0, 120));
