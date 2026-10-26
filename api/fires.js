@@ -4,7 +4,6 @@
 
 const SOURCES = ["VIIRS_SNPP_NRT", "VIIRS_NOAA20_NRT", "VIIRS_NOAA21_NRT"];
 const AREA = "94,-12,142,7"; // west,south,east,north (Indonesia)
-const DAYS = 2;              // fetch 2 days, then keep the last 24 hours
 
 function parseCsv(text) {
   const lines = text.trim().split(/\r?\n/);
@@ -33,6 +32,9 @@ function parseCsv(text) {
 const toMs = r => Date.parse(r[2] + "T" + r[3].slice(0, 2) + ":" + r[3].slice(2, 4) + ":00Z");
 
 async function handler(req, res) {
+  // ?days=1..7 → keep the last N×24 hours (fetch one extra day so the window is always full)
+  const days = Math.min(7, Math.max(1, parseInt((req.query && req.query.days) || "1", 10) || 1));
+  const DAYS = days + 1;
   const key = process.env.FIRMS_MAP_KEY;
   if (!key) {
     res.status(503).json({ error: "FIRMS_MAP_KEY belum diatur di Vercel." });
@@ -50,11 +52,12 @@ async function handler(req, res) {
     const failed = results.filter(x => x.status === "rejected").map(x => String(x.reason && x.reason.message || x.reason));
     if (!rows.length && failed.length) throw new Error(failed.join(" | "));
     const latest = rows.reduce((m, r) => Math.max(m, toMs(r)), 0);
-    const recent = rows.filter(r => toMs(r) > latest - 24 * 3600e3);
+    const recent = rows.filter(r => toMs(r) > latest - days * 24 * 3600e3);
     res.setHeader("Cache-Control", "s-maxage=900, stale-while-revalidate=1800");
     res.status(200).json({
       generated: new Date().toISOString(),
       latest: latest ? new Date(latest).toISOString() : null,
+      days,
       sources: SOURCES,
       warnings: failed,
       rows: recent
