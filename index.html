@@ -72,7 +72,7 @@ a{color:var(--accent)}
 .leaflet-tooltip.ptip::before{display:none}
 
 .overlay{position:absolute;z-index:500;display:flex;gap:8px;flex-wrap:wrap}
-.ov-top{top:12px;left:12px;right:60px}
+.ov-top{top:12px;left:12px;right:60px;z-index:650}
 .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:3px}
 .seg button{border:0;background:none;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .seg button[aria-pressed="true"]{background:var(--panel-2);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
@@ -486,7 +486,7 @@ const BASES=(function(){
     satelit:{nm:"Satelit",ds:"Foto udara resolusi tinggi",layers:()=>[esri("World_Imagery",{attribution:imgAttr})],light:false,tiles:true,maxZoom:18,prev:s=>"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/5/16/26"},
     hybrid:{nm:"Satelit + label",ds:"Foto udara, nama tempat & jalan",layers:()=>[esri("World_Imagery",{attribution:imgAttr}),esri("Reference/World_Boundaries_and_Places",{attribution:"Label: Esri"}),esri("Reference/World_Transportation",{attribution:""})],light:false,tiles:true,maxZoom:18,prev:s=>"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/5/16/26",prev2:"https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/5/16/26"},
     terrain:{nm:"Terrain",ds:"Relief, gunung & sungai",layers:()=>[esri("World_Topo_Map",{attribution:"Peta: Esri, HERE, Garmin, USGS, NGA"})],light:true,tiles:true,maxZoom:18,prev:s=>"https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/5/16/26"},
-    jalan:{nm:"Jalan",ds:"Jalan & kota (OpenStreetMap)",layers:()=>[L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:"&copy; OpenStreetMap &copy; CARTO"})],light:true,tiles:true,maxZoom:19,prev:s=>"https://a.basemaps.cartocdn.com/rastertiles/voyager/5/26/16.png"},
+    jalan:{nm:"Jalan",ds:"Jalan, kota & desa",layers:()=>[esri("World_Street_Map",{attribution:"Peta: Esri, HERE, Garmin, OpenStreetMap"})],light:true,tiles:true,maxZoom:18,prev:s=>"https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/5/16/26"},
     asap:{nm:"Asap hari ini",ds:"Foto NASA harian: asap & awan",layers:()=>[L.tileLayer("/api/tile?z={z}&x={x}&y={y}&date="+latestImageDay(),{maxNativeZoom:9,maxZoom:12,attribution:"Citra harian: NASA GIBS (NOAA-20 VIIRS)"})],light:false,tiles:true,maxZoom:12,prev:s=>"/api/tile?z=5&x=26&y=16&date="+latestImageDay()}
   };
 })();
