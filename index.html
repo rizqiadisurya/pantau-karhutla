@@ -178,6 +178,7 @@ a{color:var(--accent)}
 
 /* Pulse for newest detections */
 .pulse{width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2px solid var(--accent);animation:pulse 1.8s ease-out infinite;pointer-events:none}
+#map.far .pulse{width:12px;height:12px;margin:-6px 0 0 -6px;border-width:1.5px}
 @keyframes pulse{0%{transform:scale(.35);opacity:1}100%{transform:scale(1.6);opacity:0}}
 @media (prefers-reduced-motion:reduce){.pulse{animation:none;opacity:.7;transform:scale(.8)}}
 
@@ -384,7 +385,8 @@ function ago(ms){const m=Math.round((LATEST-ms)/60000);if(m<=1)return"pada detek
 function frpColor(f){return f<5?"var(--frp1)":f<20?"var(--frp2)":f<60?"var(--frp3)":"var(--frp4)"}
 const FRP_HEX={1:"#ffd166",2:"#ff9f1c",3:"#ff5a1f",4:"#e5173f"};
 function frpHex(f){return FRP_HEX[f<5?1:f<20?2:f<60?3:4]}
-function frpRadius(f){return Math.max(3,Math.min(13,2.4+Math.sqrt(f)*1.05))}
+function zoomFactor(){const z=(typeof map!=="undefined"&&map.getZoom)?map.getZoom():5;return Math.max(.35,Math.min(1,.35+(z-3.5)*.18))}
+function frpRadius(f){return Math.max(1.6,Math.min(13,2.4+Math.sqrt(f)*1.05)*zoomFactor())}
 const CONF_LBL={h:"Tinggi",n:"Sedang",l:"Rendah"};
 
 /* ---------- data model ---------- */
@@ -463,8 +465,11 @@ const dotLayer=L.layerGroup().addTo(map);
 const pulseLayer=L.layerGroup().addTo(map);
 let selRing=null;
 const markerById=new Map();
+function rescale(){const byId=new Map(DATA.map(d=>[d.id,d]));markerById.forEach((m,id)=>{const d=byId.get(id);if(d)m.setRadius(frpRadius(d.frp))});document.getElementById("map").classList.toggle("far",map.getZoom()<5.5);if(state.sel!=null)renderDetail()}
+map.on("zoomend",rescale);
 function buildMarkers(){
   dotLayer.clearLayers();markerById.clear();
+  document.getElementById("map").classList.toggle("far",map.getZoom()<5.5);
   DATA.slice().sort((a,b)=>a.frp-b.frp).forEach(d=>{
     const m=L.circleMarker([d.lat,d.lon],{renderer:canvas,radius:frpRadius(d.frp),color:"#1a0d04",weight:.6,fillColor:frpHex(d.frp),fillOpacity:.88});
     m.on("click",()=>select(d.id,false));
