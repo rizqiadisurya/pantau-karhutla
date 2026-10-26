@@ -1067,10 +1067,12 @@ async function loadWindGrid(){
   WIND={t:Date.now(),pts:j.map((p,i)=>({lat:lats[i],lon:lons[i],time:p.hourly.time,spd:p.hourly.wind_speed_10m,dir:p.hourly.wind_direction_10m}))};return WIND;
 }
 function windColor(k){return k<10?"#9fd8ff":k<20?"#c6f0ff":k<35?"#ffd166":"#ff9f1c"}
+let windTok=0;
 async function drawWind(){
-  windLayer.clearLayers();if(!windOn)return;
+  const tok=++windTok;windLayer.clearLayers();if(!windOn)return;
   const ld=$("loading");$("loadingTxt").textContent="Memuat peta angin…";ld.hidden=false;
   try{const W=await loadWindGrid();
+    if(tok!==windTok||!windOn)return;windLayer.clearLayers();
     const target=Date.now()+windK*24*3600e3;
     const P0=W.pts[0];let idx=0,bd=1e15;P0.time.forEach((s,i)=>{const d=Math.abs(Date.parse(s+":00Z")-target);if(d<bd){bd=d;idx=i}});
     W.pts.forEach(p=>{const s=p.spd[idx],dir=p.dir[idx];if(s==null)return;const len=Math.round(14+Math.min(30,s*.9));
