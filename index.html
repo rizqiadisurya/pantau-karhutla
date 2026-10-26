@@ -154,6 +154,28 @@ a{color:var(--accent)}
 .d-close{margin-left:auto;border:0;background:none;color:var(--muted);cursor:pointer;font-size:12.5px}
 .d-close:hover{color:var(--fg)}
 .d-hint{font-size:12px;color:var(--faint)}
+/* satellite photos */
+.shot{position:relative;border-radius:6px;overflow:hidden;background:var(--panel);border:1px solid var(--line);aspect-ratio:1/1;max-width:100%}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
+.shot .ph-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:12px;font-size:12px;color:var(--muted)}
+.shot-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.shot-bar b{color:var(--fg);font-weight:500}
+.shot-nav{display:flex;gap:4px}
+.shot-nav button{border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:3px 8px;cursor:pointer;font-size:12px;color:var(--fg)}
+.shot-nav button:disabled{opacity:.4;cursor:default}
+.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gcard{border:1px solid var(--line);background:var(--panel-2);border-radius:8px;overflow:hidden;cursor:pointer;text-align:left;padding:0;display:flex;flex-direction:column;min-width:0}
+.gcard:hover{border-color:var(--accent)}
+.gcard .shot{border:0;border-radius:0}
+.gcard .gb{padding:7px 9px 9px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.gcard .gb b{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcard .gb span{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcard .gb .co{color:var(--conc)}
+.badge{position:absolute;top:6px;left:6px;background:rgba(12,29,36,.85);color:var(--fg);font-size:11px;font-family:var(--font-mono);padding:2px 6px;border-radius:4px;border:1px solid var(--line)}
+.phpin{width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:8px;border:2px solid var(--accent);overflow:hidden;background:var(--panel);box-shadow:0 4px 14px rgba(0,0,0,.5);position:relative;cursor:pointer}
+.phpin img{width:100%;height:100%;object-fit:cover;display:block}
+.phpin b{position:absolute;right:2px;bottom:2px;background:var(--accent);color:#1a0d04;font-size:10px;font-weight:700;padding:0 4px;border-radius:3px;font-family:var(--font-mono)}
+#map.far .phpin{width:44px;height:44px;margin:-22px 0 0 -22px}
 
 .pill{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:3px;border:1px solid currentColor;line-height:1.3}
 .pill.h{color:var(--conf-h)} .pill.n{color:var(--conf-n)} .pill.l{color:var(--conf-l)}
@@ -239,6 +261,9 @@ a{color:var(--accent)}
         <button type="button" data-base="peta" aria-pressed="true">Peta</button>
         <button type="button" data-base="citra" aria-pressed="false">Citra satelit</button>
       </div>
+      <div class="seg" role="group" aria-label="Foto satelit">
+        <button type="button" id="photoToggle" aria-pressed="true">Foto kebakaran</button>
+      </div>
     </div>
     <div class="legend" aria-label="Legenda">
       <h4>Daya radiasi api (FRP)</h4>
@@ -271,6 +296,12 @@ a{color:var(--accent)}
     </div>
 
     <div class="sec detail" id="detail" hidden></div>
+
+    <div class="sec">
+      <h2>Foto satelit terbaru <small id="galDate"></small></h2>
+      <div class="gallery" id="gallery"></div>
+      <p class="caveat">Foto warna asli dari satelit NOAA-20 (VIIRS, resolusi ±375 m) melalui NASA GIBS, dengan titik api VIIRS berwarna merah. Kepulan asap terlihat sebagai kabut putih kecokelatan. Foto tiap area ±65 × 65 km; klik untuk melihat detail.</p>
+    </div>
 
     <div class="sec">
       <h2>Per provinsi <small>klik untuk menyaring</small></h2>
@@ -410,7 +441,7 @@ function loadData(rows,src){
   DATA=prepare(rows).sort((a,b)=>b.ms-a.ms);
   LATEST=DATA.length?DATA[0].ms:Date.now();
   SOURCE=src;state.prov=null;state.comp=null;state.sel=null;state.cursor=null;stopPlay();
-  renderSource();buildMarkers();update();
+  photoKey="";renderSource();buildMarkers();update();
 }
 
 /* ---------- state ---------- */
@@ -543,6 +574,42 @@ function renderList(list){
   if(!list.length){el.innerHTML='<div class="empty">Tidak ada titik panas yang cocok dengan saringan.</div>';return}
   el.innerHTML=list.slice(0,N).map(d=>'<button type="button" class="item" data-id="'+d.id+'" aria-current="'+(state.sel===d.id)+'"><span class="sw" style="background:'+frpColor(d.frp)+'"></span><span class="w"><b>'+esc(d.town?d.town[1]:"Lepas pantai")+'</b><span>'+esc(d.prov||"Di luar daratan")+' · '+d.frp.toFixed(1)+' MW</span>'+(d.conc?'<span class="co">Konsesi: '+esc(d.conc.company)+'</span>':'')+'</span><span class="r"><span class="tm">'+fmtTime(d.ms,d.off)+' '+d.zn+'</span><span class="pill '+d.conf+'">'+CONF_LBL[d.conf]+'</span></span></button>').join("")+(list.length>N?'<div class="more">+'+(list.length-N).toLocaleString("id-ID")+' titik lainnya. Saring per provinsi atau perbesar peta untuk melihatnya.</div>':"");
 }
+/* ---------- satellite photos (NASA GIBS via /api/citra) ---------- */
+function isoDay(ms){return new Date(ms).toISOString().slice(0,10)}
+function addDays(iso,n){return isoDay(Date.parse(iso+"T00:00:00Z")+n*864e5)}
+function latestImageDay(){return isoDay(Date.now()-5*3600e3)} // today's mosaic needs a few hours after the ~13:30 local pass
+function imgDay(d){let day=isoDay(d.ms);if(new Date(d.ms).getUTCHours()>=12)day=addDays(day,1);const lim=latestImageDay();return day>lim?lim:day}
+function citraUrl(lat,lon,day,size){return "/api/citra?lat="+lat.toFixed(2)+"&lon="+lon.toFixed(2)+"&date="+day+"&size="+size}
+function fmtIsoDay(iso){const d=new Date(iso+"T00:00:00Z");return d.getUTCDate()+" "+BULAN[d.getUTCMonth()].slice(0,3)+" "+d.getUTCFullYear()}
+function shotHtml(lat,lon,day,size,badge){return '<div class="shot">'+(badge?'<span class="badge">'+badge+'</span>':'')+'<img loading="lazy" alt="Foto satelit area titik panas, '+fmtIsoDay(day)+'" src="'+citraUrl(lat,lon,day,size)+'" onerror="this.nextSibling.textContent=\'Foto belum tersedia untuk tanggal ini\';this.remove()"><div class="ph-empty" aria-hidden="true">Memuat foto satelit…</div></div>'}
+function photoClusters(list){
+  const g=new Map();
+  list.forEach(d=>{const k=Math.round(d.lat/.3)+":"+Math.round(d.lon/.3);let c=g.get(k);if(!c){c={n:0,frp:0,top:d,latest:d,comps:{}};g.set(k,c)}c.n++;c.frp+=d.frp;if(d.frp>c.top.frp)c.top=d;if(d.ms>c.latest.ms)c.latest=d;if(d.conc)c.comps[d.conc.company]=(c.comps[d.conc.company]||0)+1});
+  return [...g.values()].sort((a,b)=>b.frp-a.frp).slice(0,8);
+}
+const photoLayer=L.layerGroup().addTo(map);
+let photoKey="",showPhotos=true;
+function renderPhotos(){
+  const list=filtered({ignoreCursor:true});
+  const cl=photoClusters(list);
+  const key=cl.map(c=>c.top.id+":"+c.n).join("|")+"|"+showPhotos;
+  if(key===photoKey)return;photoKey=key;
+  photoLayer.clearLayers();
+  const gal=$("gallery");
+  if(!cl.length){gal.innerHTML='<div class="empty">Tidak ada titik panas pada saringan ini.</div>';$("galDate").textContent="";return}
+  const days=cl.map(c=>imgDay(c.top));
+  $("galDate").textContent="citra "+fmtIsoDay(days.reduce((a,b)=>a>b?a:b));
+  gal.innerHTML=cl.map((c,i)=>{const d=c.top,day=days[i];const co=Object.keys(c.comps).sort((a,b)=>c.comps[b]-c.comps[a])[0];
+    return '<button type="button" class="gcard" data-id="'+d.id+'">'+shotHtml(d.lat,d.lon,day,320,c.n+" titik")+'<span class="gb"><b>'+esc(d.town&&d.townKm<120?d.town[1]:(d.prov||"Lepas pantai"))+'</b><span>'+esc(d.prov||"")+' · terbaru '+fmtTime(c.latest.ms,c.latest.off)+' '+c.latest.zn+'</span>'+(co?'<span class="co">Konsesi: '+esc(co)+'</span>':'')+'</span></button>'}).join("");
+  if(showPhotos)cl.forEach((c,i)=>{const d=c.top;
+    L.marker([d.lat,d.lon],{keyboard:false,zIndexOffset:1000,icon:L.divIcon({className:"",iconSize:[0,0],html:'<div class="phpin" title="Foto satelit '+fmtIsoDay(days[i])+'"><img loading="lazy" alt="" src="'+citraUrl(d.lat,d.lon,days[i],160)+'"><b>'+c.n+'</b></div>'})}).on("click",()=>select(d.id,true)).addTo(photoLayer)});
+}
+let imgOffset=0,imgOffsetFor=null;
+function detailShot(d){
+  if(imgOffsetFor!==d.id){imgOffset=0;imgOffsetFor=d.id}
+  const base=imgDay(d),day=addDays(base,imgOffset);
+  return '<div class="shot-bar"><span>Foto satelit <b>'+fmtIsoDay(day)+'</b>'+(imgOffset===0?' (terbaru)':'')+'</span><span class="shot-nav"><button type="button" id="shPrev" aria-label="Foto hari sebelumnya">‹ Sebelumnya</button><button type="button" id="shNext" aria-label="Foto hari berikutnya"'+(imgOffset>=0?' disabled':'')+'>Berikutnya ›</button></span></div>'+shotHtml(d.lat,d.lon,day,640,'')+'<div class="d-hint">Area ±65 × 65 km berpusat di titik ini. Kalau foto tampak gelap atau tertutup awan, coba hari sebelumnya.</div>';
+}
 function renderDetail(){
   const el=$("detail");const d=DATA.find(x=>x.id===state.sel);
   if(!d){el.hidden=true;if(selRing){map.removeLayer(selRing);selRing=null}return}
@@ -558,6 +625,7 @@ function renderDetail(){
    '<div class="d-date">'+fmtDate(d.ms,d.off)+' · '+ago(d.ms)+'</div>'+
    '<div class="d-loc">'+esc(d.prov||"Di luar daratan Indonesia")+'<small>'+esc(near)+'</small></div>'+
    (d.conc?'<div class="conc-box"><span>Di dalam area konsesi</span><b>'+esc(d.conc.company)+'</b><span>'+esc([d.conc.type,d.conc.permit,d.conc.group?"Grup "+d.conc.group:null,d.conc.area?Math.round(d.conc.area).toLocaleString("id-ID")+" ha":null].filter(Boolean).join(" · "))+'</span>'+(d.conc.src?'<span class="srcl">Sumber: '+esc(d.conc.src.replace("Indonesia Ministry of Forestry","Kementerian Kehutanan").replace("Indonesia Ministry of Environment and Forestry","KLHK").replace("via","via"))+'</span>':'')+'</div>':'<div class="conc-box none">Di luar area konsesi yang dimuat</div>')+
+   detailShot(d)+
    '<dl class="kv">'+
      '<dt>Koordinat</dt><dd><span class="mono">'+coord+'</span><button type="button" class="copy" id="dCopy">Salin</button></dd>'+
      '<dt>Satelit</dt><dd>'+esc(d.sat)+(d.dn?' · '+(d.dn==="D"?"siang":"malam"):'')+'</dd>'+
@@ -565,9 +633,11 @@ function renderDetail(){
      '<dt>FRP</dt><dd><span class="mono">'+d.frp.toFixed(1)+' MW</span><div class="frpbar"><i style="width:'+Math.min(100,Math.sqrt(d.frp/150)*100).toFixed(0)+'%;background:'+frpColor(d.frp)+'"></i></div></dd>'+
    '</dl>'+
    '<div class="links"><a class="btn primary" href="'+wv+'" target="_blank" rel="noopener">Citra satelit (NASA Worldview)</a><a class="btn" href="'+fm+'" target="_blank" rel="noopener">Peta FIRMS</a><a class="btn" href="'+gm+'" target="_blank" rel="noopener">Google Maps</a></div>'+
-   '<div class="d-hint">Citra Worldview menampilkan foto satelit warna asli pada tanggal deteksi, dengan lapisan anomali panas VIIRS di atasnya.</div>';
+   '';
   el.hidden=false;
   $("dClose").onclick=()=>{state.sel=null;update()};
+  $("shPrev").onclick=()=>{imgOffset--;renderDetail()};
+  $("shNext").onclick=()=>{if(imgOffset<0){imgOffset++;renderDetail()}};
   $("dCopy").onclick=e=>{const b=e.currentTarget;const done=()=>{b.textContent="Tersalin";setTimeout(()=>b.textContent="Salin",1400)};try{navigator.clipboard.writeText(coord).then(done,()=>selectText(b.previousSibling))}catch(_){selectText(b.previousSibling)}};
   if(selRing)map.removeLayer(selRing);
   selRing=L.circleMarker([d.lat,d.lon],{radius:frpRadius(d.frp)+7,color:"#ff8a3d",weight:2,fill:false,interactive:false}).addTo(map);
@@ -612,7 +682,7 @@ $("playBtn").onclick=()=>{
 function update(){
   const list=filtered();
   if(state.sel!=null&&!list.some(d=>d.id===state.sel))state.sel=null;
-  renderMap(list);renderStats(list);renderProvs();renderComps();renderList(list);renderDetail();renderTimeline();styleProvs();styleConc();
+  renderMap(list);renderStats(list);renderProvs();renderComps();renderList(list);renderDetail();renderPhotos();renderTimeline();styleProvs();styleConc();
 }
 function toggleComp(name,fromMap){
   state.comp=state.comp===name?null:name;state.sel=null;update();
@@ -683,6 +753,8 @@ async function fetchLive(){
 fetchLive();
 setInterval(()=>{if(SOURCE.live||SOURCE.archive)fetchLive()},15*60*1000);
 document.querySelectorAll("[data-base]").forEach(b=>b.onclick=()=>setBase(b.dataset.base));
+$("photoToggle").onclick=e=>{showPhotos=!showPhotos;e.currentTarget.setAttribute("aria-pressed",showPhotos);renderPhotos()};
+$("gallery").addEventListener("click",e=>{const b=e.target.closest(".gcard");if(b)select(+b.dataset.id,true)});
 </script>
 </body>
 </html>
