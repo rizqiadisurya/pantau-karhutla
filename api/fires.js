@@ -63,12 +63,24 @@ async function handler(req, res) {
     const failed = results.filter(x => x.status === "rejected").map(x => String(x.reason && x.reason.message || x.reason));
     if (!rows.length && failed.length) throw new Error(failed.join(" | "));
     const latest = rows.reduce((m, r) => Math.max(m, toMs(r)), 0);
-    const recent = rows.filter(r => toMs(r) > latest - days * 24 * 3600e3);
+    let recent = rows.filter(r => toMs(r) > latest - days * 24 * 3600e3);
+    // Multi-day ranges: merge detections within ~2 km on the same day (keep the strongest; r[8] = count)
+    if (days > 1) {
+      const cells = new Map();
+      for (const r of recent) {
+        const k = Math.round(r[0] / 0.02) + ":" + Math.round(r[1] / 0.02) + ":" + r[2];
+        const o = cells.get(k);
+        if (!o) cells.set(k, r.concat(1));
+        else { o[8]++; if (r[6] > o[6]) { const n = o[8]; cells.set(k, r.concat(n)); } }
+      }
+      recent = [...cells.values()];
+    }
     res.setHeader("Cache-Control", "s-maxage=900, stale-while-revalidate=1800");
     res.status(200).json({
       generated: new Date().toISOString(),
       latest: latest ? new Date(latest).toISOString() : null,
       days,
+      merged: days > 1,
       sources: SOURCES,
       warnings: failed,
       rows: recent

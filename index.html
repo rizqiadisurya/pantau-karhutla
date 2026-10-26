@@ -535,6 +535,7 @@ a{color:var(--accent)}
         <div class="faq">
           <details open><summary>Apa itu titik api?</summary><p>Titik api (hotspot) adalah area seluas ±375 × 375 meter yang dideteksi satelit jauh lebih panas dari sekitarnya. Kebanyakan berasal dari kebakaran hutan dan lahan, tapi bisa juga dari pembakaran sampah atau industri. Perlu dicek di lapangan untuk memastikan.</p></details>
           <details><summary>Kenapa ada wilayah yang tampil 0 padahal sedang terbakar?</summary><p>Satelit hanya melintas sekitar dua kali sehari (±13.30 dan ±01.30 waktu setempat). Awan atau asap tebal bisa menutupi api, dan api gambut sering membara di bawah permukaan sehingga tidak terdeteksi. Pilih rentang 3 atau 7 hari untuk melihat riwayat yang lebih lengkap.</p></details>
+          <details><summary>Kenapa angka 3 dan 7 hari disebut “lokasi api”?</summary><p>Satu kebakaran bisa terdeteksi berkali-kali oleh tiga satelit dalam sehari. Agar peta tetap ringan dan mudah dibaca, untuk rentang 3 dan 7 hari deteksi yang berjarak ±2 km pada hari yang sama digabung menjadi satu lokasi. Rentang 6 dan 24 jam menampilkan setiap deteksi.</p></details>
           <details><summary>Apa arti kekuatan api?</summary><p>Diukur dari daya radiasi api (FRP) dalam megawatt. Kecil di bawah 5 MW, sedang 5–20 MW, besar 20–60 MW, dan sangat besar di atas 60 MW. Makin besar, biasanya makin luas atau makin panas apinya.</p></details>
           <details><summary>Apakah perusahaan di area konsesi pasti bersalah?</summary><p>Tidak. Peta hanya menunjukkan api terdeteksi di dalam batas izin perusahaan. Penyebab kebakaran ditentukan lewat penyelidikan resmi. Data batas sawit berasal dari 2012 dan HTI dari 2021, sehingga sebagian pemilik mungkin sudah berganti.</p></details>
           <details><summary>Apakah lokasi saya disimpan?</summary><p>Tidak. Fitur “Dekat saya” menghitung jarak di perangkat Anda sendiri. Lokasi tidak dikirim ke server mana pun.</p></details>
@@ -682,7 +683,7 @@ function prepare(rows){
     if(!p&&(lon>140.9||inNeighbour(lon,lat)))return; // Papua New Guinea, Timor-Leste, Malaysia, etc.
     const [zn,off]=zoneFor(p,lon);
     const nt=nearestTown(lat,lon);
-    out.push({id:i,lat,lon,ms,date:r.acq_date,sat:SATS[String(r.satellite||"").trim()]||(r.satellite?String(r.satellite):"Satelit"),conf:normConf(r.confidence),frp:+r.frp||0,dn:r.daynight||"",prov:p?p.name:null,zn,off,town:nt.t,townKm:nt.d,concId:r.conc_id,conc:concFor(r.conc_id,lon,lat)});
+    out.push({id:i,n:+r.n||1,lat,lon,ms,date:r.acq_date,sat:SATS[String(r.satellite||"").trim()]||(r.satellite?String(r.satellite):"Satelit"),conf:normConf(r.confidence),frp:+r.frp||0,dn:r.daynight||"",prov:p?p.name:null,zn,off,town:nt.t,townKm:nt.d,concId:r.conc_id,conc:concFor(r.conc_id,lon,lat)});
   });
   return out;
 }
@@ -822,9 +823,10 @@ function renderSummary(list){
   const ks=Object.keys(byProv).sort((a,b)=>byProv[b]-byProv[a]);
   const top=list.reduce((a,b)=>(!a||b.frp>a.frp)?b:a,null);
   const where=state.prov?" di "+esc(state.prov):state.comp?" di konsesi "+esc(state.comp):" di Indonesia";
-  $("summaryLead").innerHTML=list.length?"<b>"+fmtNum(list.length)+" titik api</b> terdeteksi"+where+" dalam "+winLabel(state.win)+"."+(ks.length&&!state.prov?" Terbanyak di <b>"+esc(ks[0])+"</b> ("+fmtNum(byProv[ks[0]])+" titik).":"")+(state.cursor!=null?" Ditampilkan sampai pukul "+fmtTime(state.cursor,7)+" WIB.":""):"Tidak ada titik api"+where+" dalam "+winLabel(state.win)+". Coba rentang 3 atau 7 hari.";
+  const det=list.reduce((s,d)=>s+d.n,0),merged=det>list.length;
+  $("summaryLead").innerHTML=list.length?"<b>"+fmtNum(list.length)+" "+(merged?"lokasi api":"titik api")+"</b>"+(merged?" (gabungan "+fmtNum(det)+" deteksi satelit)":"")+" terdeteksi"+where+" dalam "+winLabel(state.win)+"."+(ks.length&&!state.prov?" Terbanyak di <b>"+esc(ks[0])+"</b> ("+fmtNum(byProv[ks[0]])+" titik).":"")+(state.cursor!=null?" Ditampilkan sampai pukul "+fmtTime(state.cursor,7)+" WIB.":""):"Tidak ada titik api"+where+" dalam "+winLabel(state.win)+". Coba rentang 3 atau 7 hari.";
   $("sTotal").textContent=fmtNum(list.length);
-  $("sWin").textContent=winLabel(state.win);
+  $("sWin").textContent=winLabel(state.win)+(merged?" · lokasi":"");
   $("sProv").textContent=ks.length;
   $("sProvTop").textContent=ks.length?"Terbanyak: "+ks[0]:"–";
   $("sFrp").textContent=top?FRP_LBL[frpLv(top.frp)]:"–";
@@ -966,6 +968,7 @@ function renderDetail(){
    '<div class="sec"><div class="dhero"><h2 class="place" style="font-family:var(--font-body);letter-spacing:0;text-transform:none;color:var(--fg)">'+esc(placeName(d))+'</h2><span class="prov">'+(placeName(d)===d.prov?'Koordinat '+d.lat.toFixed(3)+', '+d.lon.toFixed(3):esc(d.prov||"Di luar daratan Indonesia")+(near&&!placeName(d).startsWith("±")?' · '+esc(near):''))+'</span>'+
      '<div class="dtime"><span class="t">'+fmtTime(d.ms,d.off)+'</span><span class="z">'+d.zn+'</span><span class="rel">'+relNow(d.ms)+(d.zn!=="WIB"?' · '+fmtTime(d.ms,7)+' WIB':'')+'</span></div><span class="ddate">'+fmtDate(d.ms,d.off)+'</span></div>'+
      '<div class="facts"><div class="fact"><span class="k">Kekuatan api</span><span class="v" style="color:'+frpColor(d.frp)+'">'+FRP_LBL[lv]+'</span><span class="s">'+d.frp.toFixed(1)+' MW</span></div><div class="fact"><span class="k">Keyakinan</span><span class="v">'+CONF_LBL[d.conf]+'</span><span class="s">deteksi satelit</span></div><div class="fact"><span class="k">Sekitar 10 km</span><span class="v">'+fmtNum(around)+' titik lain</span><span class="s">'+winLabel(state.win)+'</span></div></div>'+
+     (d.n>1?'<p class="hint" style="color:var(--muted)">Gabungan '+fmtNum(d.n)+' deteksi satelit dalam ±2 km pada hari yang sama. Waktu dan kekuatan diambil dari deteksi terkuat.</p>':'')+
      (youKm!=null?'<p class="hint" style="color:var(--muted)">± '+Math.round(youKm)+' km ke arah '+arah(bearing(state.user.lat,state.user.lon,d.lat,d.lon))+' dari lokasi Anda.</p>':'')+
      (d.conc?'<div class="conc-box"><span>Di dalam area konsesi</span><b>'+esc(d.conc.company)+'</b><span>'+esc([d.conc.type,d.conc.permit,d.conc.group?"Grup "+d.conc.group:null,d.conc.area?fmtNum(Math.round(d.conc.area))+" ha":null].filter(Boolean).join(" · "))+'</span>'+(d.conc.src?'<span class="srcl">Sumber: '+esc(d.conc.src.replace("Indonesia Ministry of Forestry","Kementerian Kehutanan").replace("Indonesia Ministry of Environment and Forestry","KLHK"))+'</span>':'')+'<button type="button" class="linkbtn" id="dComp" style="margin-top:4px">Lihat semua titik api di konsesi ini →</button></div>':'<div class="conc-box none">Tidak berada di area konsesi perusahaan yang tercatat.</div>')+
    '</div>'+
@@ -1204,7 +1207,7 @@ async function fetchLive(days,keep){
     if(!j.rows.length)throw new Error("FIRMS tidak mengembalikan titik api.");
     FETCHED_AT=Date.now();
     const selId=state.sel;
-    loadData(j.rows.map(a=>({latitude:a[0],longitude:a[1],acq_date:a[2],acq_time:a[3],satellite:a[4],confidence:a[5],frp:a[6],daynight:a[7]})),{real:true,live:true,name:"NASA FIRMS"},{hours:(j.days||days||1)*24,keep:!!keep,deepLink:!liveOk});
+    loadData(j.rows.map(a=>({latitude:a[0],longitude:a[1],acq_date:a[2],acq_time:a[3],satellite:a[4],confidence:a[5],frp:a[6],daynight:a[7],n:a[8]})),{real:true,live:true,name:"NASA FIRMS"},{hours:(j.days||days||1)*24,keep:!!keep,deepLink:!liveOk});
     liveOk=true;return true;
   }catch(e){
     if(!liveOk&&SOURCE.archive){SOURCE.note="Data live belum tersedia ("+e.message+"). Menampilkan arsip terakhir.";renderSource();openDeepLink()}
