@@ -167,6 +167,7 @@ a{color:var(--accent)}
 
 /* ---------- Side panel ---------- */
 .side{border-left:1px solid var(--line);background:var(--panel);overflow-y:auto;min-height:0;display:flex;flex-direction:column;scroll-behavior:smooth}
+.side>*{flex-shrink:0}
 .tabs{position:sticky;top:0;z-index:5;display:flex;gap:2px;background:var(--panel);border-bottom:1px solid var(--line);padding:0 8px;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tabs button{border:0;background:none;padding:12px 10px 10px;cursor:pointer;font-size:13.5px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
@@ -823,9 +824,10 @@ function renderSummary(list){
   $("sWin").textContent=winLabel(state.win);
   $("sProv").textContent=ks.length;
   $("sProvTop").textContent=ks.length?"Terbanyak: "+ks[0]:"–";
-  $("sFrp").innerHTML=top?FRP_LBL[frpLv(top.frp)]+'<small>'+top.frp.toFixed(0)+' MW</small>':"–";
+  $("sFrp").textContent=top?FRP_LBL[frpLv(top.frp)]:"–";
   $("sFrp").style.fontSize=top&&frpLv(top.frp)===4?"24px":"";
-  $("sFrpLoc").textContent=top?placeName(top):"–";
+  $("sFrp").style.color=top?frpColor(top.frp):"";
+  $("sFrpLoc").textContent=top?top.frp.toFixed(0)+" MW · "+placeName(top):"–";
   $("sBigCard").dataset.id=top?top.id:"";
   const inC=list.filter(d=>d.conc);
   const byC={};inC.forEach(d=>byC[d.conc.company]=(byC[d.conc.company]||0)+1);
