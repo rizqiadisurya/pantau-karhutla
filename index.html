@@ -10,9 +10,7 @@
 <meta name="theme-color" content="#11252c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@600;700&display=swap">
-<style>
-/*__LEAFLET_CSS__*/
-</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0}
@@ -190,7 +188,8 @@ a{color:var(--accent)}
   .mapwrap{height:68vh;min-height:420px}
   .side{border-left:0;border-top:1px solid var(--line);overflow:visible}
   .sec{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-  .legend{bottom:auto;top:56px}
+  .legend{bottom:112px;padding:6px 8px;font-size:11px}
+  .legend h4{margin-bottom:4px}
   .ov-top{right:12px}
   .top-meta{margin-left:0}
 }
