@@ -170,7 +170,7 @@ a{color:var(--accent)}
 .side>*{flex-shrink:0}
 .tabs{position:sticky;top:0;z-index:5;display:flex;gap:2px;background:var(--panel);border-bottom:1px solid var(--line);padding:0 8px;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tabs button{border:0;background:none;padding:12px 10px 10px;cursor:pointer;font-size:13.5px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.tabs button{border:0;background:none;padding:12px 8px 10px;cursor:pointer;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .tabs button:hover{color:var(--fg)}
 .tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:500}
 .tabs .cnt{font-family:var(--font-mono);font-size:11px;color:var(--faint);background:var(--panel-2);border-radius:4px;padding:0 5px}
@@ -310,10 +310,10 @@ a{color:var(--accent)}
 .conc-box span{color:var(--muted);font-size:12px}
 .conc-box .srcl{color:var(--faint);font-size:11.5px}
 .conc-box.none{border-color:var(--line);background:none;color:var(--muted)}
-.shot-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
+.shot-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 8px;font-size:12.5px;color:var(--muted)}
 .shot-bar b{color:var(--fg);font-weight:500}
 .shot-nav{display:flex;gap:4px}
-.shot-nav button{border:1px solid var(--line);background:var(--panel-2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px;color:var(--fg)}
+.shot-nav button{white-space:nowrap;border:1px solid var(--line);background:var(--panel-2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px;color:var(--fg)}
 .shot-nav button:disabled{opacity:.4;cursor:default}
 .ctx{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;font-size:13px;margin:0}
 .ctx dt{color:var(--faint)}
@@ -454,7 +454,7 @@ a{color:var(--accent)}
     <div class="tabs" role="tablist" aria-label="Bagian panel">
       <button type="button" role="tab" id="tab-ringkasan" aria-controls="p-ringkasan" aria-selected="true" data-tab="ringkasan">Ringkasan</button>
       <button type="button" role="tab" id="tab-wilayah" aria-controls="p-wilayah" aria-selected="false" data-tab="wilayah">Wilayah</button>
-      <button type="button" role="tab" id="tab-perusahaan" aria-controls="p-perusahaan" aria-selected="false" data-tab="perusahaan">Perusahaan <span class="cnt" id="cntComp"></span></button>
+      <button type="button" role="tab" id="tab-perusahaan" aria-controls="p-perusahaan" aria-selected="false" data-tab="perusahaan">Perusahaan<span class="sr" id="cntComp"></span></button>
       <button type="button" role="tab" id="tab-titik" aria-controls="p-titik" aria-selected="false" data-tab="titik">Titik api <span class="cnt" id="cntList"></span></button>
       <button type="button" role="tab" id="tab-info" aria-controls="p-info" aria-selected="false" data-tab="info">Info</button>
     </div>
@@ -637,6 +637,8 @@ function buildConc(fc){
 }
 function concFor(id,lon,lat){if(id!==undefined&&CONC_SRC.embedded)return id?CONC_BY_ID.get(id)||null:null;return findConc(lon,lat)}
 function findConc(lon,lat){for(const s of CONC){if(lon<s.b[0]||lon>s.b[2]||lat<s.b[1]||lat>s.b[3])continue;for(const p of s.polys)if(polyContains(p,lon,lat))return s}return null}
+const NB_SHAPES=NB.features.map(f=>{const g=f.geometry;const polys=g.type==="Polygon"?[g.coordinates]:g.coordinates;let b=[180,90,-180,-90];polys.forEach(p=>p[0].forEach(([x,y])=>{b[0]=Math.min(b[0],x);b[1]=Math.min(b[1],y);b[2]=Math.max(b[2],x);b[3]=Math.max(b[3],y)}));return {polys,b}});
+function inNeighbour(lon,lat){for(const s of NB_SHAPES){if(lon<s.b[0]||lon>s.b[2]||lat<s.b[1]||lat>s.b[3])continue;for(const p of s.polys)if(polyContains(p,lon,lat))return true}return false}
 function findProv(lon,lat){for(const s of PROV_SHAPES){if(lon<s.b[0]||lon>s.b[2]||lat<s.b[1]||lat>s.b[3])continue;for(const p of s.polys)if(polyContains(p,lon,lat))return s}return null}
 function km(lat1,lon1,lat2,lon2){const R=6371,r=Math.PI/180,dLat=(lat2-lat1)*r,dLon=(lon2-lon1)*r;const a=Math.sin(dLat/2)**2+Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(a))}
 function bearing(lat1,lon1,lat2,lon2){const r=Math.PI/180,y=Math.sin((lon2-lon1)*r)*Math.cos(lat2*r),x=Math.cos(lat1*r)*Math.sin(lat2*r)-Math.sin(lat1*r)*Math.cos(lat2*r)*Math.cos((lon2-lon1)*r);return (Math.atan2(y,x)/r+360)%360}
@@ -677,6 +679,7 @@ function prepare(rows){
     const t=String(r.acq_time||"0").padStart(4,"0");
     const ms=Date.parse(r.acq_date+"T"+t.slice(0,2)+":"+t.slice(2,4)+":00Z");if(isNaN(ms))return;
     const p=findProv(lon,lat);
+    if(!p&&(lon>140.9||inNeighbour(lon,lat)))return; // Papua New Guinea, Timor-Leste, Malaysia, etc.
     const [zn,off]=zoneFor(p,lon);
     const nt=nearestTown(lat,lon);
     out.push({id:i,lat,lon,ms,date:r.acq_date,sat:SATS[String(r.satellite||"").trim()]||(r.satellite?String(r.satellite):"Satelit"),conf:normConf(r.confidence),frp:+r.frp||0,dn:r.daynight||"",prov:p?p.name:null,zn,off,town:nt.t,townKm:nt.d,concId:r.conc_id,conc:concFor(r.conc_id,lon,lat)});
