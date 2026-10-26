@@ -365,6 +365,12 @@ a{color:var(--accent)}
 }
 @media (max-width:520px){
   .status .full{display:none}
+  .brand h1{font-size:21px}
+  #nearBtn{padding:7px 9px}
+  #nearBtn .nb-t{display:none}
+  .tabs{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+  .tabs button:last-child{margin-right:24px}
+  #tlLabel{max-width:60%}
   .seg button{padding:5px 8px}
   .tbtn small{display:none}
   .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -386,7 +392,7 @@ a{color:var(--accent)}
     <ul class="qres" id="qres" role="listbox" hidden></ul>
   </div>
   <div class="top-act">
-    <button type="button" class="btn" id="nearBtn" title="Cari titik api terdekat dari lokasi Anda"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Dekat saya</span></button>
+    <button type="button" class="btn" id="nearBtn" title="Cari titik api terdekat dari lokasi Anda" aria-label="Dekat saya: cari titik api terdekat dari lokasi Anda"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span class="nb-t">Dekat saya</span></button>
     <button type="button" class="status" id="status" title="Tentang data"><span class="dot"></span><span><b id="statusMain">Memuat…</b> <span class="full" id="statusSub"></span></span></button>
   </div>
 </header>
@@ -824,7 +830,7 @@ function renderSummary(list){
   const top=list.reduce((a,b)=>(!a||b.frp>a.frp)?b:a,null);
   const where=state.prov?" di "+esc(state.prov):state.comp?" di konsesi "+esc(state.comp):" di Indonesia";
   const det=list.reduce((s,d)=>s+d.n,0),merged=det>list.length;
-  $("summaryLead").innerHTML=list.length?"<b>"+fmtNum(list.length)+" "+(merged?"lokasi api":"titik api")+"</b>"+(merged?" (gabungan "+fmtNum(det)+" deteksi satelit)":"")+" terdeteksi"+where+" dalam "+winLabel(state.win)+"."+(ks.length&&!state.prov?" Terbanyak di <b>"+esc(ks[0])+"</b> ("+fmtNum(byProv[ks[0]])+" titik).":"")+(state.cursor!=null?" Ditampilkan sampai pukul "+fmtTime(state.cursor,7)+" WIB.":""):"Tidak ada titik api"+where+" dalam "+winLabel(state.win)+". Coba rentang 3 atau 7 hari.";
+  $("summaryLead").innerHTML=list.length?"<b>"+fmtNum(list.length)+" "+(merged?"lokasi api":"titik api")+"</b>"+(merged?" (gabungan "+fmtNum(det)+" deteksi satelit)":"")+" terdeteksi"+where+" dalam "+winLabel(state.win)+"."+(ks.length&&!state.prov?" Terbanyak di <b>"+esc(ks[0])+"</b> ("+fmtNum(byProv[ks[0]])+(merged?" lokasi).":" titik)."):"")+(state.cursor!=null?" Ditampilkan sampai pukul "+fmtTime(state.cursor,7)+" WIB.":""):"Tidak ada titik api"+where+" dalam "+winLabel(state.win)+". Coba rentang 3 atau 7 hari.";
   $("sTotal").textContent=fmtNum(list.length);
   $("sWin").textContent=winLabel(state.win)+(merged?" · lokasi":"");
   $("sProv").textContent=ks.length;
