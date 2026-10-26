@@ -154,6 +154,23 @@ a{color:var(--accent)}
 .d-close{margin-left:auto;border:0;background:none;color:var(--muted);cursor:pointer;font-size:12.5px}
 .d-close:hover{color:var(--fg)}
 .d-hint{font-size:12px;color:var(--faint)}
+/* basemap switcher */
+.basesw{position:relative}
+.basebtn{gap:2px;align-items:center;cursor:pointer;padding:3px 10px 3px 3px;font-size:12.5px}
+.basebtn b{font-weight:500;color:var(--fg);padding:0 4px}
+.basebtn svg{width:10px;height:6px;fill:none;stroke:var(--muted);stroke-width:1.5}
+.basepop{position:absolute;top:calc(100% + 6px);left:0;z-index:700;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;grid-template-columns:repeat(3,92px);gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.bopt{border:1px solid var(--line);background:var(--panel-2);border-radius:8px;padding:0;cursor:pointer;display:flex;flex-direction:column;overflow:hidden;text-align:left}
+.bopt:hover{border-color:var(--muted)}
+.bopt[aria-checked="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.bopt .pv{position:relative;height:58px;background:var(--land);overflow:hidden}
+.bopt .pv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bopt .pv.dark{background:linear-gradient(135deg,var(--sea) 0 38%,var(--land) 38% 70%,var(--sea) 70%)}
+.bopt .nm{font-size:12px;font-weight:500;padding:5px 7px 1px}
+.bopt .ds{font-size:10.5px;color:var(--muted);padding:0 7px 6px;line-height:1.3}
+.basepop .note{grid-column:1/-1;font-size:11px;color:var(--faint);margin:2px 0 0}
+@media (max-width:860px){.basesw{position:static}.basepop{left:0;right:auto;max-width:100%}}
+@media (max-width:480px){.basepop{grid-template-columns:repeat(2,minmax(0,1fr));left:0;right:0}}
 /* satellite photos */
 .shot{position:relative;border-radius:6px;overflow:hidden;background:var(--panel);border:1px solid var(--line);aspect-ratio:1/1;max-width:100%}
 .shot img{display:block;width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
@@ -257,9 +274,9 @@ a{color:var(--accent)}
       <div class="seg" role="group" aria-label="Lapisan konsesi">
         <button type="button" id="concToggle" aria-pressed="true">Batas konsesi</button>
       </div>
-      <div class="seg" role="group" aria-label="Peta dasar">
-        <button type="button" data-base="peta" aria-pressed="true">Peta</button>
-        <button type="button" data-base="citra" aria-pressed="false">Citra satelit</button>
+      <div class="basesw">
+        <button type="button" class="seg basebtn" id="baseBtn" aria-haspopup="true" aria-expanded="false"><span class="lbl">Jenis peta</span><b id="baseName">Peta</b><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+        <div class="basepop" id="basePop" hidden role="menu" aria-label="Pilih jenis peta"></div>
       </div>
       <div class="seg" role="group" aria-label="Foto satelit">
         <button type="button" id="photoToggle" aria-pressed="true">Foto kebakaran</button>
@@ -458,11 +475,33 @@ map.attributionControl.setPrefix(false);
 map.attributionControl.addAttribution("Batas wilayah: Natural Earth · Format data: NASA FIRMS");
 const canvas=L.canvas({padding:.3});
 const nbLayer=L.geoJSON(NB,{interactive:false,style:{color:"#2b4249",weight:.6,fillColor:"#16272d",fillOpacity:1}}).addTo(map);
-const provLayer=L.geoJSON(IDN,{renderer:L.svg(),style:()=>({color:"#3a585e",weight:.8,fillColor:"#1b3037",fillOpacity:1}),onEachFeature:(f,l)=>{const nm=PROV_ID[f.properties.name]||f.properties.name;l.bindTooltip(()=>{const c=filtered({ignoreProv:true}).filter(d=>d.prov===nm).length;return "<b>"+nm+"</b><br>"+c+" titik panas"},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});l.on("click",()=>{toggleProv(nm,true)});l.on("mouseover",()=>{if(baseMode!=="citra")l.setStyle({fillColor:"#223c44"})});l.on("mouseout",()=>styleProvs())}}).addTo(map);
-function styleProvs(){provLayer.eachLayer(l=>{const nm=PROV_ID[l.feature.properties.name]||l.feature.properties.name;const on=state.prov===nm;const fo=baseMode==="citra"?0:1;l.setStyle(on?{fillColor:"#24424a",fillOpacity:fo,color:"#ff8a3d",weight:1.6}:{fillColor:"#1b3037",fillOpacity:fo,color:baseMode==="citra"?"#e9eee6":"#3a585e",weight:baseMode==="citra"?.6:.8})})}
-const imagery=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:17,attribution:"Citra: Esri, Maxar, Earthstar Geographics"});
-let baseMode="peta";
-function setBase(m){baseMode=m;if(m==="citra"){imagery.addTo(map);imagery.bringToBack();nbLayer.setStyle({fillOpacity:0,opacity:.4})}else{map.removeLayer(imagery);nbLayer.setStyle({fillOpacity:1,opacity:1})}map.setMaxZoom(m==="citra"?17:12);styleProvs();document.querySelectorAll("[data-base]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.base===m))}
+const provLayer=L.geoJSON(IDN,{renderer:L.svg(),style:()=>({color:"#3a585e",weight:.8,fillColor:"#1b3037",fillOpacity:1}),onEachFeature:(f,l)=>{const nm=PROV_ID[f.properties.name]||f.properties.name;l.bindTooltip(()=>{const c=filtered({ignoreProv:true}).filter(d=>d.prov===nm).length;return "<b>"+nm+"</b><br>"+c+" titik panas"},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});l.on("click",()=>{toggleProv(nm,true)});l.on("mouseover",()=>{if(!(BASES[baseMode]||{}).tiles)l.setStyle({fillColor:"#223c44"})});l.on("mouseout",()=>styleProvs())}}).addTo(map);
+function styleProvs(){provLayer.eachLayer(l=>{const nm=PROV_ID[l.feature.properties.name]||l.feature.properties.name;const on=state.prov===nm;const B=BASES[baseMode]||{},tiles=!!B.tiles,fo=tiles?0:1;l.setStyle(on?{fillColor:"#24424a",fillOpacity:tiles?.08:1,color:"#ff8a3d",weight:2}:{fillColor:"#1b3037",fillOpacity:fo,color:tiles?(B.light?"#5a6b6a":"#e9eee6"):"#3a585e",weight:tiles?.7:.8,opacity:tiles?.55:1})})}
+const BASES=(function(){
+  const esri=(svc,o={})=>L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/"+svc+"/MapServer/tile/{z}/{y}/{x}",Object.assign({maxZoom:18,maxNativeZoom:17},o));
+  const imgAttr="Citra: Esri, Maxar, Earthstar Geographics";
+  const pv=(z,x,y)=>({z,x,y});
+  return {
+    peta:{nm:"Peta",ds:"Gelap, fokus titik api",layers:()=>[],light:false,tiles:false,maxZoom:12},
+    satelit:{nm:"Satelit",ds:"Foto udara resolusi tinggi",layers:()=>[esri("World_Imagery",{attribution:imgAttr})],light:false,tiles:true,maxZoom:18,prev:s=>"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/5/16/26"},
+    hybrid:{nm:"Satelit + label",ds:"Foto udara, nama tempat & jalan",layers:()=>[esri("World_Imagery",{attribution:imgAttr}),esri("Reference/World_Boundaries_and_Places",{attribution:"Label: Esri"}),esri("Reference/World_Transportation",{attribution:""})],light:false,tiles:true,maxZoom:18,prev:s=>"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/5/16/26",prev2:"https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/5/16/26"},
+    terrain:{nm:"Terrain",ds:"Relief, gunung & sungai",layers:()=>[esri("World_Topo_Map",{attribution:"Peta: Esri, HERE, Garmin, USGS, NGA"})],light:true,tiles:true,maxZoom:18,prev:s=>"https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/5/16/26"},
+    jalan:{nm:"Jalan",ds:"Jalan & kota (OpenStreetMap)",layers:()=>[L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:"&copy; OpenStreetMap &copy; CARTO"})],light:true,tiles:true,maxZoom:19,prev:s=>"https://a.basemaps.cartocdn.com/rastertiles/voyager/5/26/16.png"},
+    asap:{nm:"Asap hari ini",ds:"Foto NASA harian: asap & awan",layers:()=>[L.tileLayer("/api/tile?z={z}&x={x}&y={y}&date="+latestImageDay(),{maxNativeZoom:9,maxZoom:12,attribution:"Citra harian: NASA GIBS (NOAA-20 VIIRS)"})],light:false,tiles:true,maxZoom:12,prev:s=>"/api/tile?z=5&x=26&y=16&date="+latestImageDay()}
+  };
+})();
+let baseMode="peta",baseLayers=[];
+function setBase(m){
+  const b=BASES[m];if(!b)return;baseMode=m;
+  baseLayers.forEach(l=>map.removeLayer(l));baseLayers=b.layers();baseLayers.forEach(l=>{l.addTo(map);l.bringToBack()});
+  nbLayer.setStyle(b.tiles?{fillOpacity:0,opacity:0}:{fillOpacity:1,opacity:1});
+  map.setMaxZoom(b.maxZoom);styleProvs();
+  $("baseName").textContent=b.nm;
+  document.querySelectorAll(".bopt").forEach(x=>x.setAttribute("aria-checked",x.dataset.base===m));
+}
+function buildBasePop(){
+  $("basePop").innerHTML=Object.entries(BASES).map(([k,b])=>'<button type="button" class="bopt" role="menuitemradio" data-base="'+k+'" aria-checked="'+(k===baseMode)+'"><span class="pv'+(b.prev?'':' dark')+'">'+(b.prev?'<img alt="" loading="lazy" src="'+b.prev()+'">':'')+(b.prev2?'<img alt="" loading="lazy" src="'+b.prev2+'">':'')+'</span><span class="nm">'+b.nm+(k==="asap"?' · '+fmtIsoDay(latestImageDay()).replace(/ \d{4}$/,""):'')+'</span><span class="ds">'+b.ds+'</span></button>').join("")+'<p class="note">Lalu lintas (traffic) real-time butuh kunci API layanan peta berbayar.</p>';
+}
 const IDN_BOUNDS=L.latLngBounds([[-11.2,94.8],[6.2,141.2]]);
 map.fitBounds(IDN_BOUNDS,{padding:[10,10]});
 map.setMaxBounds(IDN_BOUNDS.pad(.6));
@@ -753,7 +792,12 @@ async function fetchLive(){
 }
 fetchLive();
 setInterval(()=>{if(SOURCE.live||SOURCE.archive)fetchLive()},15*60*1000);
-document.querySelectorAll("[data-base]").forEach(b=>b.onclick=()=>setBase(b.dataset.base));
+function toggleBasePop(open){const p=$("basePop");const o=open??p.hidden;if(o)buildBasePop();p.hidden=!o;$("baseBtn").setAttribute("aria-expanded",o)}
+$("baseBtn").onclick=e=>{e.stopPropagation();toggleBasePop()};
+$("basePop").addEventListener("click",e=>{e.stopPropagation();const b=e.target.closest(".bopt");if(b){setBase(b.dataset.base);toggleBasePop(false)}});
+document.addEventListener("click",()=>{if(!$("basePop").hidden)toggleBasePop(false)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("basePop").hidden){toggleBasePop(false);$("baseBtn").focus()}});
+L.DomEvent.disableClickPropagation(document.querySelector(".ov-top"));L.DomEvent.disableScrollPropagation(document.querySelector(".ov-top"));
 $("photoToggle").onclick=e=>{showPhotos=!showPhotos;e.currentTarget.setAttribute("aria-pressed",showPhotos);renderPhotos()};
 $("gallery").addEventListener("click",e=>{const b=e.target.closest(".gcard");if(b)select(+b.dataset.id,true)});
 </script>
