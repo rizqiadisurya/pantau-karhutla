@@ -9,7 +9,7 @@
 <meta property="og:description" content="Peta titik api karhutla Indonesia dari satelit NASA, diperbarui setiap 15 menit.">
 <meta name="theme-color" content="#11252c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
 *,*::before,*::after{box-sizing:border-box}
@@ -35,14 +35,14 @@ img{max-width:100%}
   --frp1:#ffd166; --frp2:#ff9f1c; --frp3:#ff5a1f; --frp4:#e5173f;
   --conc:#7fd3c6; --conc-fill:rgba(127,211,198,.10);
   --conf-h:#ff6b4a; --conf-n:#f0b54a; --conf-l:#9bb2ae;
-  --font-display:"Saira Condensed","Arial Narrow",system-ui,sans-serif;
-  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --font-display:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"Plus Jakarta Sans",system-ui,sans-serif;
   --r:8px;
   --side:420px;
 }
 html,body{height:100%}
-body{background:var(--sea);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.45;display:flex;flex-direction:column}
+body{background:var(--sea);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;display:flex;flex-direction:column}
 button,input{font:inherit;color:inherit}
 a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -52,7 +52,7 @@ a{color:var(--accent)}
 /* ---------- Header ---------- */
 .top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px 20px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line);background:var(--panel);position:relative;z-index:900}
 .brand{display:flex;flex-direction:column;gap:1px;min-width:0}
-.brand h1{font-family:var(--font-display);font-weight:700;font-size:25px;letter-spacing:.02em;margin:0;line-height:1;text-transform:uppercase;white-space:nowrap}
+.brand h1{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:.01em;margin:0;line-height:1;text-transform:uppercase;white-space:nowrap}
 .brand h1 span{color:var(--accent)}
 .brand p{margin:0;color:var(--faint);font-size:12px;white-space:nowrap}
 .search{position:relative;max-width:520px;width:100%;justify-self:center}
@@ -177,7 +177,7 @@ a{color:var(--accent)}
 .panel{display:flex;flex-direction:column}
 .sec{padding:16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
 .sec:last-child{border-bottom:0}
-.sec h2{margin:0;font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sec h2{margin:0;font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .sec h2 small{font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:12px;color:var(--faint);font-weight:400}
 .lead{margin:0;font-size:13.5px;color:var(--muted)}
 .lead b{color:var(--fg);font-weight:600}
@@ -192,7 +192,7 @@ a{color:var(--accent)}
 .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .stat{background:var(--panel);padding:11px 12px;min-width:0;display:flex;flex-direction:column;gap:1px}
 .stat .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-.stat .v{font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .v{font-family:var(--font-display);font-weight:800;font-size:23px;line-height:1.15;font-variant-numeric:tabular-nums}
 .stat .v small{font-family:var(--font-body);font-size:12.5px;font-weight:400;color:var(--muted);margin-left:4px}
 .stat .s{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat.alert .v{color:var(--conf-h)}
@@ -205,7 +205,7 @@ a{color:var(--accent)}
 .near.cta p{margin:0;font-size:13px;color:var(--muted);flex:1}
 .near.cta p b{display:block;color:var(--fg);font-weight:600;font-size:14px}
 .near .big{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.near .big b{font-family:var(--font-display);font-size:30px;line-height:1;font-weight:700}
+.near .big b{font-family:var(--font-display);font-size:25px;line-height:1;font-weight:700}
 .near .big span{color:var(--muted);font-size:13px}
 .near.safe .big b{color:var(--live)}
 .near.warn .big b{color:var(--frp2)}
@@ -296,7 +296,7 @@ a{color:var(--accent)}
 .dhero .place{font-size:19px;font-weight:600;line-height:1.25;margin:0}
 .dhero .prov{color:var(--muted);font-size:13px}
 .dtime{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
-.dtime .t{font-family:var(--font-display);font-weight:700;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.dtime .t{font-family:var(--font-display);font-weight:800;font-size:32px;line-height:1;font-variant-numeric:tabular-nums}
 .dtime .z{font-family:var(--font-mono);font-size:12px;color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:1px 5px}
 .dtime .rel{color:var(--muted);font-size:13px}
 .ddate{color:var(--muted);font-size:13px}
@@ -1248,7 +1248,7 @@ function renderTimeline(){
   }
   s+='<line x1="0" x2="'+W+'" y1="'+(Ht-bot+.5)+'" y2="'+(Ht-bot+.5)+'" stroke="#26434b"/>';
   const ticks=S.span<=24?[0,6,12,18,24].map(h=>[h,fmtTime(S.start+h*3600e3,7)]):Array.from({length:S.span/24+1},(_,k)=>[k*24,k===S.span/24?fmtTime(LATEST,7):fmtShortDate(S.start+k*24*3600e3,7)]).filter((_,k,a)=>S.span<=72||k%2===0||k===a.length-1);
-  ticks.forEach(([h,lab])=>{const x=Math.min(W-16,Math.max(16,h/S.span*W));s+='<text x="'+x.toFixed(1)+'" y="'+(Ht-2)+'" fill="#a2b6b2" font-size="10" text-anchor="middle" font-family="IBM Plex Mono, monospace">'+lab+'</text>'});
+  ticks.forEach(([h,lab])=>{const x=Math.min(W-16,Math.max(16,h/S.span*W));s+='<text x="'+x.toFixed(1)+'" y="'+(Ht-2)+'" fill="#a2b6b2" font-size="10" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">'+lab+'</text>'});
   if(state.win<S.span)s+='<rect x="0" y="0" width="'+((S.span-state.win)/S.span*W).toFixed(1)+'" height="'+(Ht-bot)+'" fill="#0c1d24" opacity=".55"/>';
   if(state.cursor!=null){const x=(state.cursor-S.start)/(S.span*3600e3)*W;s+='<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="0" y2="'+(Ht-bot)+'" stroke="#e9eee6" stroke-width="1.5"/>'}
   svg.setAttribute("viewBox","0 0 "+W+" "+Ht);svg.innerHTML=s;
