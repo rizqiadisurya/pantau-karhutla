@@ -154,6 +154,28 @@ a{color:var(--accent)}
 .d-close{margin-left:auto;border:0;background:none;color:var(--muted);cursor:pointer;font-size:12.5px}
 .d-close:hover{color:var(--fg)}
 .d-hint{font-size:12px;color:var(--faint)}
+/* population & health */
+.hgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.htile{background:var(--panel);padding:10px 12px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.htile .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.htile .v{font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.htile.alert .v{color:var(--conf-h)}
+.htile .s{font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.chips span{font-size:11px;border:1px solid var(--line);border-radius:3px;padding:1px 6px;color:var(--fg);font-variant-numeric:tabular-nums;background:var(--panel-2)}
+.hscroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+.htable{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;min-width:360px}
+.htable th{font-weight:500;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);text-align:right;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.htable th:first-child,.htable td:first-child{text-align:left}
+.htable td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.htable tr:last-child td{border-bottom:0}
+.htable tbody tr{cursor:pointer}
+.htable tbody tr:hover{background:var(--panel-2)}
+.htable tbody tr[aria-selected="true"]{box-shadow:inset 3px 0 0 var(--accent);background:var(--panel-2)}
+.htable .rate{display:inline-flex;align-items:center;gap:6px;justify-content:flex-end}
+.htable .rate i{display:inline-block;height:6px;border-radius:3px;background:var(--conf-h);opacity:.8}
+.htable .na{color:var(--faint)}
+.caveat a{color:var(--muted)}
 /* basemap switcher */
 .basesw{position:relative}
 .basebtn{gap:2px;align-items:center;cursor:pointer;padding:3px 10px 3px 3px;font-size:12.5px}
@@ -314,6 +336,16 @@ a{color:var(--accent)}
 
     <div class="sec detail" id="detail" hidden></div>
 
+    <div class="sec" id="healthSec">
+      <h2>Penduduk &amp; dampak kesehatan <small id="hChecked"></small></h2>
+      <div class="hgrid">
+        <div class="htile"><div class="k">Penduduk Indonesia</div><div class="v" id="hPop">–</div><div class="s" id="hPopSub">–</div></div>
+        <div class="htile alert"><div class="k">Kasus ISPA akibat asap karhutla</div><div class="v" id="hIspa">–</div><div class="s" id="hIspaSub">–</div><div class="chips" id="hIspaChips"></div></div>
+      </div>
+      <div class="hscroll"><table class="htable" id="hTable"></table></div>
+      <p class="caveat" id="hNote"></p>
+    </div>
+
     <div class="sec">
       <h2>Foto satelit terbaru <small id="galDate"></small></h2>
       <div class="gallery" id="gallery"></div>
@@ -359,6 +391,7 @@ a{color:var(--accent)}
 <script src="data/geo.js"></script>
 <script src="data/concessions.js"></script>
 <script src="data/archive.js"></script>
+<script src="data/health.js"></script>
 <script>
 const IDN = window.IDN_GEO;
 const NB = window.NB_GEO;
@@ -475,7 +508,7 @@ map.attributionControl.setPrefix(false);
 map.attributionControl.addAttribution("Batas wilayah: Natural Earth · Format data: NASA FIRMS");
 const canvas=L.canvas({padding:.3});
 const nbLayer=L.geoJSON(NB,{interactive:false,style:{color:"#2b4249",weight:.6,fillColor:"#16272d",fillOpacity:1}}).addTo(map);
-const provLayer=L.geoJSON(IDN,{renderer:L.svg(),style:()=>({color:"#3a585e",weight:.8,fillColor:"#1b3037",fillOpacity:1}),onEachFeature:(f,l)=>{const nm=PROV_ID[f.properties.name]||f.properties.name;l.bindTooltip(()=>{const c=filtered({ignoreProv:true}).filter(d=>d.prov===nm).length;return "<b>"+nm+"</b><br>"+c+" titik panas"},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});l.on("click",()=>{toggleProv(nm,true)});l.on("mouseover",()=>{if(!(BASES[baseMode]||{}).tiles)l.setStyle({fillColor:"#223c44"})});l.on("mouseout",()=>styleProvs())}}).addTo(map);
+const provLayer=L.geoJSON(IDN,{renderer:L.svg(),style:()=>({color:"#3a585e",weight:.8,fillColor:"#1b3037",fillOpacity:1}),onEachFeature:(f,l)=>{const nm=PROV_ID[f.properties.name]||f.properties.name;l.bindTooltip(()=>{const c=filtered({ignoreProv:true}).filter(d=>d.prov===nm).length;const pp=popFor(nm),ii=ispaFor(nm);return "<b>"+nm+"</b><br>"+c+" titik panas"+(pp?"<br>Penduduk "+fmtJt(pp):"")+(ii!=null?"<br>ISPA "+ii.toLocaleString("id-ID")+" kasus":"")},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});l.on("click",()=>{toggleProv(nm,true)});l.on("mouseover",()=>{if(!(BASES[baseMode]||{}).tiles)l.setStyle({fillColor:"#223c44"})});l.on("mouseout",()=>styleProvs())}}).addTo(map);
 function styleProvs(){provLayer.eachLayer(l=>{const nm=PROV_ID[l.feature.properties.name]||l.feature.properties.name;const on=state.prov===nm;const B=BASES[baseMode]||{},tiles=!!B.tiles,fo=tiles?0:1;l.setStyle(on?{fillColor:"#24424a",fillOpacity:tiles?.08:1,color:"#ff8a3d",weight:2}:{fillColor:"#1b3037",fillOpacity:fo,color:tiles?(B.light?"#5a6b6a":"#e9eee6"):"#3a585e",weight:tiles?.7:.8,opacity:tiles?.55:1})})}
 const BASES=(function(){
   const esri=(svc,o={})=>L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/"+svc+"/MapServer/tile/{z}/{y}/{x}",Object.assign({maxZoom:18,maxNativeZoom:17},o));
@@ -597,6 +630,27 @@ function renderComps(){
   else el.innerHTML=ks.map(k=>{const o=by.get(k);const sub=[o.type,o.group?"Grup "+o.group:null].filter(Boolean).join(" · ")+(o.area?" · "+Math.round(o.area).toLocaleString("id-ID")+" ha":"");return '<button type="button" class="prow'+(o.n?"":" zero")+'" data-comp="'+esc(k)+'" aria-pressed="'+(state.comp===k)+'"><span class="n">'+esc(k)+'</span><span class="c">'+o.n+'</span>'+(sub?'<span class="sub">'+esc(sub)+'</span>':'')+'<span class="bar"><i style="width:'+(o.n/max*100).toFixed(1)+'%"></i></span></button>'}).join("")+(rest>0?'<div class="more">'+rest.toLocaleString("id-ID")+' perusahaan lain tanpa titik panas pada rentang ini.</div>':'');
   $("compReset").hidden=!state.comp;
 }
+/* ---------- population & ISPA ---------- */
+const H=window.HEALTH_DATA||null;
+function fmtJt(n){return (n/1e6).toLocaleString("id-ID",{maximumFractionDigits:1,minimumFractionDigits:1})+" jt"}
+function popFor(name){if(!H)return null;const P=H.population;const g=P.mapGroups[name];if(g)return g.reduce((s,k)=>s+(P.byProvince[k]||0),0);return P.byProvince[name]??null}
+function popNote(name){return H&&H.population.mapGroups[name]?" (termasuk "+H.population.mapGroups[name].slice(1).join(", ")+")":""}
+function ispaFor(name){return H?H.ispa.byProvince.cases[name]??null:null}
+function renderHealth(){
+  const sec=$("healthSec");if(!H){sec.hidden=true;return}
+  const P=H.population,I=H.ispa,B=I.byProvince;
+  $("hChecked").textContent="dicek "+fmtIsoDay(H.checked);
+  $("hPop").textContent=(P.total/1e6).toLocaleString("id-ID",{maximumFractionDigits:1})+" juta";
+  $("hPopSub").textContent=P.total.toLocaleString("id-ID")+" jiwa · per "+fmtIsoDay(P.asOf);
+  $("hIspa").textContent=I.total.toLocaleString("id-ID");
+  $("hIspaSub").textContent=I.provinces.length+" provinsi · per "+fmtIsoDay(I.asOf);
+  $("hIspaChips").innerHTML='<span>'+I.balita.toLocaleString("id-ID")+' balita</span><span>± '+I.daily.toLocaleString("id-ID")+' kasus/hari</span>';
+  const hot={};filtered({ignoreProv:true,ignoreComp:true,ignoreCursor:true}).forEach(d=>{if(d.prov)hot[d.prov]=(hot[d.prov]||0)+1});
+  const rows=I.provinces.map(n=>{const pop=P.byProvince[n],c=B.cases[n]??null;return {n,pop,c,rate:c!=null&&pop?c/pop*1000:null,hot:hot[n]||0}}).sort((a,b)=>(b.c??-1)-(a.c??-1));
+  const maxRate=Math.max(...rows.map(r=>r.rate||0),1);
+  $("hTable").innerHTML='<thead><tr><th>Provinsi</th><th>Penduduk</th><th>ISPA*</th><th>per 1.000</th><th>Titik panas</th></tr></thead><tbody>'+rows.map(r=>'<tr data-prov="'+esc(r.n)+'" aria-selected="'+(state.prov===r.n)+'"><td>'+esc(r.n)+'</td><td>'+fmtJt(r.pop)+'</td><td>'+(r.c!=null?r.c.toLocaleString("id-ID"):'<span class="na">–</span>')+'</td><td>'+(r.rate!=null?'<span class="rate"><i style="width:'+Math.round(r.rate/maxRate*36)+'px"></i>'+r.rate.toLocaleString("id-ID",{maximumFractionDigits:1,minimumFractionDigits:1})+'</span>':'<span class="na">–</span>')+'</td><td>'+r.hot.toLocaleString("id-ID")+'</td></tr>').join("")+'</tbody>';
+  $("hNote").innerHTML='*Rincian per provinsi per '+fmtIsoDay(B.asOf)+' ('+B.total.toLocaleString("id-ID")+' kasus); Jambi belum dirinci. Total terbaru per '+fmtIsoDay(I.asOf)+'. "Per 1.000" = kasus ISPA per 1.000 penduduk. Titik panas = '+state.win+' jam terakhir di peta. Sumber: <a href="'+I.url+'" target="_blank" rel="noopener">'+esc(I.source)+'</a>, <a href="'+B.url+'" target="_blank" rel="noopener">rincian provinsi</a>, <a href="'+P.url+'" target="_blank" rel="noopener">'+esc(P.source)+'</a>. Angka kesehatan diperbarui manual dari rilis resmi.';
+}
 function renderProvs(){
   const base=filtered({ignoreProv:true});
   const by={};base.forEach(d=>{const k=d.prov||"Di luar daratan";by[k]=(by[k]||0)+1});
@@ -604,7 +658,7 @@ function renderProvs(){
   const max=ks.length?by[ks[0]]:1;
   const el=$("provs");
   if(!ks.length){el.innerHTML='<div class="empty">Tidak ada titik panas pada rentang ini.</div>';$("provReset").hidden=true;return}
-  el.innerHTML=ks.map(k=>'<button type="button" class="prow" data-prov="'+esc(k)+'" aria-pressed="'+(state.prov===k)+'"><span class="n">'+esc(k)+'</span><span class="c">'+by[k]+'</span><span class="bar"><i style="width:'+(by[k]/max*100).toFixed(1)+'%"></i></span></button>').join("");
+  el.innerHTML=ks.map(k=>'<button type="button" class="prow" data-prov="'+esc(k)+'" aria-pressed="'+(state.prov===k)+'"><span class="n">'+esc(k)+'</span><span class="c">'+by[k]+'</span>'+(popFor(k)?'<span class="sub">Penduduk '+fmtJt(popFor(k))+(ispaFor(k)!=null?' · ISPA '+ispaFor(k).toLocaleString("id-ID"):'')+'</span>':'')+'<span class="bar"><i style="width:'+(by[k]/max*100).toFixed(1)+'%"></i></span></button>').join("");
   $("provReset").hidden=!state.prov;
 }
 function renderList(list){
@@ -663,7 +717,7 @@ function renderDetail(){
    '<h2>Detail titik panas <button type="button" class="d-close" id="dClose">Tutup ✕</button></h2>'+
    '<div class="d-time"><span class="t">'+fmtTime(d.ms,d.off)+'</span><span class="z">'+d.zn+'</span>'+(d.zn!=="WIB"?'<span class="d-hint">'+fmtTime(d.ms,7)+' WIB</span>':'')+'</div>'+
    '<div class="d-date">'+fmtDate(d.ms,d.off)+' · '+ago(d.ms)+'</div>'+
-   '<div class="d-loc">'+esc(d.prov||"Di luar daratan Indonesia")+'<small>'+esc(near)+'</small></div>'+
+   '<div class="d-loc">'+esc(d.prov||"Di luar daratan Indonesia")+'<small>'+esc(near)+'</small>'+(d.prov&&popFor(d.prov)?'<small>Penduduk provinsi '+fmtJt(popFor(d.prov))+popNote(d.prov)+(ispaFor(d.prov)!=null?' · '+ispaFor(d.prov).toLocaleString("id-ID")+' kasus ISPA (per '+fmtIsoDay(H.ispa.byProvince.asOf)+')':'')+'</small>':'')+'</div>'+
    (d.conc?'<div class="conc-box"><span>Di dalam area konsesi</span><b>'+esc(d.conc.company)+'</b><span>'+esc([d.conc.type,d.conc.permit,d.conc.group?"Grup "+d.conc.group:null,d.conc.area?Math.round(d.conc.area).toLocaleString("id-ID")+" ha":null].filter(Boolean).join(" · "))+'</span>'+(d.conc.src?'<span class="srcl">Sumber: '+esc(d.conc.src.replace("Indonesia Ministry of Forestry","Kementerian Kehutanan").replace("Indonesia Ministry of Environment and Forestry","KLHK").replace("via","via"))+'</span>':'')+'</div>':'<div class="conc-box none">Di luar area konsesi yang dimuat</div>')+
    detailShot(d)+
    '<dl class="kv">'+
@@ -722,7 +776,7 @@ $("playBtn").onclick=()=>{
 function update(){
   const list=filtered();
   if(state.sel!=null&&!list.some(d=>d.id===state.sel))state.sel=null;
-  renderMap(list);renderStats(list);renderProvs();renderComps();renderList(list);renderDetail();renderPhotos();renderTimeline();styleProvs();styleConc();
+  renderMap(list);renderStats(list);renderProvs();renderComps();renderList(list);renderDetail();renderPhotos();renderHealth();renderTimeline();styleProvs();styleConc();
 }
 function toggleComp(name,fromMap){
   state.comp=state.comp===name?null:name;state.sel=null;update();
@@ -799,6 +853,7 @@ document.addEventListener("click",()=>{if(!$("basePop").hidden)toggleBasePop(fal
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("basePop").hidden){toggleBasePop(false);$("baseBtn").focus()}});
 L.DomEvent.disableClickPropagation(document.querySelector(".ov-top"));L.DomEvent.disableScrollPropagation(document.querySelector(".ov-top"));
 $("photoToggle").onclick=e=>{showPhotos=!showPhotos;e.currentTarget.setAttribute("aria-pressed",showPhotos);renderPhotos()};
+$("hTable").addEventListener("click",e=>{const r=e.target.closest("tr[data-prov]");if(r)toggleProv(r.dataset.prov,false)});
 $("gallery").addEventListener("click",e=>{const b=e.target.closest(".gcard");if(b)select(+b.dataset.id,true)});
 </script>
 </body>
