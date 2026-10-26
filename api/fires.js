@@ -75,7 +75,7 @@ async function handler(req, res) {
       }
       recent = [...cells.values()];
     }
-    res.setHeader("Cache-Control", "s-maxage=900, stale-while-revalidate=1800");
+    res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=300");
     res.status(200).json({
       generated: new Date().toISOString(),
       latest: latest ? new Date(latest).toISOString() : null,

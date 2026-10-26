@@ -324,6 +324,28 @@ a{color:var(--accent)}
 .hint{font-size:12px;color:var(--faint);margin:0}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:2000;background:var(--fg);color:var(--sea);padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 
+/* company view */
+.cohead{display:flex;flex-direction:column;gap:6px}
+.cohead .tag{display:inline-flex;align-self:flex-start;gap:6px;align-items:center;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--conc);border:1px solid var(--conc);border-radius:999px;padding:2px 9px}
+.cohead h2.place{font-family:var(--font-body)!important;letter-spacing:0!important;text-transform:none!important;color:var(--fg)!important;font-size:21px!important;line-height:1.25}
+.cohead .grp{color:var(--muted);font-size:13px}
+.kv{display:grid;grid-template-columns:132px minmax(0,1fr);gap:8px 14px;font-size:13px;margin:0}
+.kv dt{color:var(--faint)}
+.kv dd{margin:0;min-width:0;color:var(--fg)}
+.kv dd small{display:block;color:var(--faint);font-size:11.5px;margin-top:2px}
+.prose{margin:0;font-size:13px;color:var(--muted);line-height:1.55}
+.prose b{color:var(--fg);font-weight:600}
+.blk{display:flex;flex-direction:column;gap:5px}
+.blk h3{margin:0;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:500}
+.permits{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.permits li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:8px 10px;border-top:1px solid var(--line);font-size:12.5px}
+.permits li:first-child{border-top:0}
+.permits li span{color:var(--muted)}
+.permits li b{font-weight:500;font-family:var(--font-mono);font-size:12px;text-align:right}
+.srclist{margin:0;padding-left:18px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;word-break:break-all}
+.srclist a{color:var(--muted)}
+.warnbox{border:1px solid var(--line);border-left:3px solid var(--conf-n);background:var(--panel-2);border-radius:6px;padding:9px 11px;font-size:12.5px;color:var(--muted)}
+.warnbox b{color:var(--fg)}
 /* info */
 .faq{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .faq details{border-top:1px solid var(--line);background:var(--panel)}
@@ -540,6 +562,7 @@ a{color:var(--accent)}
         <h2>Cara membaca peta</h2>
         <div class="faq">
           <details open><summary>Apa itu titik api?</summary><p>Titik api (hotspot) adalah area seluas ±375 × 375 meter yang dideteksi satelit jauh lebih panas dari sekitarnya. Kebanyakan berasal dari kebakaran hutan dan lahan, tapi bisa juga dari pembakaran sampah atau industri. Perlu dicek di lapangan untuk memastikan.</p></details>
+          <details><summary>Seberapa “live” datanya?</summary><p>Halaman ini mengecek data baru dari NASA FIRMS setiap 15 menit, juga saat Anda kembali membuka tab ini. Titik api baru muncul setiap kali satelit VIIRS (S-NPP, NOAA-20, NOAA-21) melintas, sekitar enam kali sehari di atas Indonesia, dengan jeda pemrosesan NASA sekitar 1–3 jam setelah satelit lewat. Jadi angka bisa sama selama beberapa jam di antara lintasan satelit, dan itu normal.</p></details>
           <details><summary>Kenapa ada wilayah yang tampil 0 padahal sedang terbakar?</summary><p>Satelit hanya melintas sekitar dua kali sehari (±13.30 dan ±01.30 waktu setempat). Awan atau asap tebal bisa menutupi api, dan api gambut sering membara di bawah permukaan sehingga tidak terdeteksi. Pilih rentang 3 atau 7 hari untuk melihat riwayat yang lebih lengkap.</p></details>
           <details><summary>Kenapa angka 3 dan 7 hari disebut “lokasi api”?</summary><p>Satu kebakaran bisa terdeteksi berkali-kali oleh tiga satelit dalam sehari. Agar peta tetap ringan dan mudah dibaca, untuk rentang 3 dan 7 hari deteksi yang berjarak ±2 km pada hari yang sama digabung menjadi satu lokasi. Rentang 6 dan 24 jam menampilkan setiap deteksi.</p></details>
           <details><summary>Apa arti kekuatan api?</summary><p>Diukur dari daya radiasi api (FRP) dalam megawatt. Kecil di bawah 5 MW, sedang 5–20 MW, besar 20–60 MW, dan sangat besar di atas 60 MW. Makin besar, biasanya makin luas atau makin panas apinya.</p></details>
@@ -577,6 +600,7 @@ a{color:var(--accent)}
 <script src="data/concessions.js"></script>
 <script src="data/archive.js"></script>
 <script src="data/health.js"></script>
+<script src="data/companies.js"></script>
 <script>
 const IDN = window.IDN_GEO;
 const NB = window.NB_GEO;
@@ -637,7 +661,7 @@ function buildConc(fc){
     let b=[180,90,-180,-90];polys.forEach(pp=>pp[0].forEach(([x,y])=>{b[0]=Math.min(b[0],x);b[1]=Math.min(b[1],y);b[2]=Math.max(b[2],x);b[3]=Math.max(b[3],y)}));
     if(b[2]<94||b[0]>142||b[3]<-12||b[1]>7)return;
     const area=parseFloat(pickField(p,FIELD_KEYS.area));
-    out.push({i,polys,b,company:String(pickField(p,FIELD_KEYS.company)||"Perusahaan tanpa nama"),group:pickField(p,FIELD_KEYS.group),type:pickField(p,FIELD_KEYS.type)||typeFromPermit(pickField(p,FIELD_KEYS.permit)),permit:permitLabel(pickField(p,FIELD_KEYS.permit)),pid:p.id||null,src:p.src||null,area:isFinite(area)?area:null,feature:f});
+    out.push({i,polys,b,company:String(pickField(p,FIELD_KEYS.company)||"Perusahaan tanpa nama"),group:pickField(p,FIELD_KEYS.group),type:pickField(p,FIELD_KEYS.type)||typeFromPermit(pickField(p,FIELD_KEYS.permit)),permit:permitLabel(pickField(p,FIELD_KEYS.permit)),pid:p.id||null,cid:p.cid||null,src:p.src||null,area:isFinite(area)?area:null,feature:f});
   });
   if(!out.length)throw new Error("Tidak ada poligon konsesi di wilayah Indonesia dalam file ini.");
   return out;
@@ -697,14 +721,15 @@ function loadData(rows,src,opts={}){
   DATA=prepare(rows).sort((a,b)=>b.ms-a.ms);
   LATEST=DATA.length?DATA[0].ms:Date.now();
   SOURCE=src;LOADED_HOURS=opts.hours||24;
-  if(!opts.keep){state.prov=null;state.comp=null}
-  state.sel=null;state.cursor=null;stopPlay();
+  if(!opts.keep){state.prov=null;state.comp=null;state.cview=null}
+  let restore=null;if(opts.keep&&opts.prevSel){const p=opts.prevSel;restore=DATA.find(d=>Math.abs(d.lat-p.lat)<.0006&&Math.abs(d.lon-p.lon)<.0006&&Math.abs(d.ms-p.ms)<60000)}
+  state.sel=restore?restore.id:null;state.cursor=null;stopPlay();
   photoKey="";buildMarkers();buildSearch();renderSource();update();
   if(opts.deepLink)openDeepLink();
 }
 
 /* ---------- state ---------- */
-const state={win:24,conf:"all",prov:null,comp:null,sel:null,cursor:null,showConc:true,tab:"ringkasan",rsort:"hot",lsort:"new",user:null};
+const state={cview:null,win:24,conf:"all",prov:null,comp:null,sel:null,cursor:null,showConc:true,tab:"ringkasan",rsort:"hot",lsort:"new",user:null};
 function inWindow(d){return d.ms>LATEST-state.win*3600e3}
 function passConf(d){return state.conf==="all"||(state.conf==="h"?d.conf==="h":d.conf!=="l")}
 function passComp(d){return !state.comp||(d.conc&&d.conc.company===state.comp)}
@@ -762,8 +787,8 @@ function drawConc(){
   if(!state.showConc)return;
   CONC.forEach(s=>{
     const lyr=L.geoJSON(s.feature,{style:()=>concStyle(s)});
-    lyr.bindTooltip(()=>{const n=DATA.filter(d=>d.conc===s&&inWindow(d)&&passConf(d)).length;return "<b>"+esc(s.company)+"</b><br>"+esc([s.type,s.group?"Grup "+s.group:null].filter(Boolean).join(" · ")||"Area konsesi")+"<br>"+fmtNum(n)+" titik api · "+winLabel(state.win)},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});
-    lyr.on("click",e=>{L.DomEvent.stopPropagation(e);toggleComp(s.company,true)});
+    lyr.bindTooltip(()=>{const n=DATA.filter(d=>d.conc===s&&inWindow(d)&&passConf(d)).length;return "<b>"+esc(s.company)+"</b><br>"+esc([s.type,s.group?"Grup "+s.group:null].filter(Boolean).join(" · ")||"Area konsesi")+"<br>"+fmtNum(n)+" titik api · "+winLabel(state.win)+"<br><span style='color:var(--faint)'>Klik untuk profil perusahaan</span>"},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});
+    lyr.on("click",e=>{L.DomEvent.stopPropagation(e);openCompany(s.company)});
     s.layer=lyr;concLayer.addLayer(lyr);
   });
 }
@@ -812,12 +837,12 @@ function ispaFor(name){return H?H.ispa.byProvince.cases[name]??null:null}
 function renderSource(){
   const st=$("status");
   st.classList.toggle("live",!!SOURCE.live);
-  if(SOURCE.live){$("statusMain").textContent="Live";$("statusSub").textContent="· deteksi terbaru "+fmtTime(LATEST,7)+" WIB"}
+  if(SOURCE.live){$("statusMain").textContent="Live";$("statusSub").textContent="· diperbarui "+(FETCHED_AT?relNow(FETCHED_AT):"–")}
   else if(SOURCE.archive){$("statusMain").textContent="Arsip";$("statusSub").textContent="· "+fmtShortDate(LATEST,7)+" "+fmtTime(LATEST,7)+" WIB"}
   else{$("statusMain").textContent="File sendiri";$("statusSub").textContent="· "+esc(SOURCE.name)}
   st.title=SOURCE.live?"Data langsung NASA FIRMS, diperbarui otomatis setiap 15 menit":"Lihat status data";
   let note;
-  if(SOURCE.live)note="<b>Data langsung dari NASA FIRMS.</b> "+fmtNum(DATA.length)+" titik api VIIRS dalam "+winLabel(LOADED_HOURS)+". Diperbarui otomatis setiap 15 menit; terakhir diambil "+(FETCHED_AT?relNow(FETCHED_AT):"–")+". Satelit melintasi Indonesia sekitar pukul 12.00–14.00 dan 00.00–02.00 WIB.";
+  if(SOURCE.live)note="<b>Data langsung dari NASA FIRMS.</b> "+fmtNum(DATA.length)+" titik api VIIRS dalam "+winLabel(LOADED_HOURS)+". Halaman ini mengambil data baru otomatis setiap 15 menit; terakhir "+(FETCHED_AT?relNow(FETCHED_AT)+" (pukul "+fmtTime(FETCHED_AT,7)+" WIB)":"–")+", berikutnya sekitar "+(typeof nextRefresh!=="undefined"?Math.max(1,Math.round((nextRefresh-Date.now())/60000))+" menit lagi":"15 menit lagi")+". Deteksi satelit terbaru: "+fmtTime(LATEST,7)+" WIB. Satelit melintasi Indonesia sekitar pukul 12.00–14.00 dan 00.00–02.00 WIB.";
   else if(SOURCE.archive)note="<b>Menampilkan arsip deteksi satelit</b> "+fmtDate(LATEST,7)+" pukul "+fmtTime(LATEST,7)+" WIB. "+(SOURCE.note?esc(SOURCE.note):"");
   else note="<b>Data dari file "+esc(SOURCE.name)+".</b> "+fmtNum(DATA.length)+" titik api di wilayah Indonesia. Rentang waktu dihitung mundur dari deteksi terbaru di file.";
   $("srcNote").innerHTML=note;
@@ -958,7 +983,9 @@ function renderPhotos(){
 let imgOffset=0,imgOffsetFor=null,detailFrom="ringkasan";
 function renderDetail(){
   const el=$("detailView");const d=DATA.find(x=>x.id===state.sel);
-  if(!d){el.hidden=true;showPanels(true);if(selMark){map.removeLayer(selMark);selMark=null}return}
+  if(!d&&selMark){map.removeLayer(selMark);selMark=null}
+  if(!d&&state.cview){renderCompany();return}
+  if(!d){el.hidden=true;showPanels(true);return}
   if(imgOffsetFor!==d.id){imgOffset=0;imgOffsetFor=d.id}
   const base=imgDay(d),day=addDays(base,imgOffset);
   const coord=d.lat.toFixed(5)+", "+d.lon.toFixed(5);
@@ -976,7 +1003,7 @@ function renderDetail(){
      '<div class="facts"><div class="fact"><span class="k">Kekuatan api</span><span class="v" style="color:'+frpColor(d.frp)+'">'+FRP_LBL[lv]+'</span><span class="s">'+d.frp.toFixed(1)+' MW</span></div><div class="fact"><span class="k">Keyakinan</span><span class="v">'+CONF_LBL[d.conf]+'</span><span class="s">deteksi satelit</span></div><div class="fact"><span class="k">Sekitar 10 km</span><span class="v">'+fmtNum(around)+' titik lain</span><span class="s">'+winLabel(state.win)+'</span></div></div>'+
      (d.n>1?'<p class="hint" style="color:var(--muted)">Gabungan '+fmtNum(d.n)+' deteksi satelit dalam ±2 km pada hari yang sama. Waktu dan kekuatan diambil dari deteksi terkuat.</p>':'')+
      (youKm!=null?'<p class="hint" style="color:var(--muted)">± '+Math.round(youKm)+' km ke arah '+arah(bearing(state.user.lat,state.user.lon,d.lat,d.lon))+' dari lokasi Anda.</p>':'')+
-     (d.conc?'<div class="conc-box"><span>Di dalam area konsesi</span><b>'+esc(d.conc.company)+'</b><span>'+esc([d.conc.type,d.conc.permit,d.conc.group?"Grup "+d.conc.group:null,d.conc.area?fmtNum(Math.round(d.conc.area))+" ha":null].filter(Boolean).join(" · "))+'</span>'+(d.conc.src?'<span class="srcl">Sumber: '+esc(d.conc.src.replace("Indonesia Ministry of Forestry","Kementerian Kehutanan").replace("Indonesia Ministry of Environment and Forestry","KLHK"))+'</span>':'')+'<button type="button" class="linkbtn" id="dComp" style="margin-top:4px">Lihat semua titik api di konsesi ini →</button></div>':'<div class="conc-box none">Tidak berada di area konsesi perusahaan yang tercatat.</div>')+
+     (d.conc?'<div class="conc-box"><span>Di dalam area konsesi</span><b>'+esc(d.conc.company)+'</b><span>'+esc([d.conc.type,d.conc.permit,d.conc.group?"Grup "+d.conc.group:null,d.conc.area?fmtNum(Math.round(d.conc.area))+" ha":null].filter(Boolean).join(" · "))+'</span>'+(d.conc.src?'<span class="srcl">Sumber: '+esc(d.conc.src.replace("Indonesia Ministry of Forestry","Kementerian Kehutanan").replace("Indonesia Ministry of Environment and Forestry","KLHK"))+'</span>':'')+'<button type="button" class="linkbtn" id="dComp" style="margin-top:4px">Profil perusahaan &amp; semua titik apinya →</button></div>':'<div class="conc-box none">Tidak berada di area konsesi perusahaan yang tercatat.</div>')+
    '</div>'+
    '<div class="sec"><div class="shot-bar"><span>Foto satelit <b>'+fmtIsoDay(day)+'</b>'+(imgOffset===0?' (terbaru)':'')+'</span><span class="shot-nav"><button type="button" id="shPrev" aria-label="Foto hari sebelumnya">‹ Sebelumnya</button><button type="button" id="shNext" aria-label="Foto hari berikutnya"'+(imgOffset>=0?' disabled':'')+'>Berikutnya ›</button></span></div>'+shotHtml(d.lat,d.lon,day,640,'')+'<p class="hint">Area ±65 × 65 km berpusat di titik ini. Titik merah = api. Kalau tertutup awan, coba hari sebelumnya.</p></div>'+
    '<div class="sec"><dl class="ctx">'+
@@ -990,7 +1017,7 @@ function renderDetail(){
   $("dBack").onclick=closeDetail;
   $("shPrev").onclick=()=>{imgOffset--;renderDetail()};
   $("shNext").onclick=()=>{if(imgOffset<0){imgOffset++;renderDetail()}};
-  if($("dComp"))$("dComp").onclick=()=>{const c=d.conc.company;closeDetail();if(state.comp!==c)toggleComp(c,false);showTab("perusahaan")};
+  if($("dComp"))$("dComp").onclick=()=>openCompany(d.conc.company);
   $("dCopy").onclick=()=>copyText(coord,"Koordinat disalin");
   $("dShare").onclick=()=>shareHotspot(d);
   if(selMark)map.removeLayer(selMark);
@@ -1005,19 +1032,77 @@ function shareHotspot(d){
   else copyText(text+" "+url,"Tautan disalin, siap dibagikan");
 }
 function openDeepLink(){
+  const pm=/[?&]perusahaan=([^&]+)/.exec(location.search);if(pm){const n=decodeURIComponent(pm[1].replace(/\+/g,' '));if(CONC.some(s=>s.company===n)){openCompany(n);return}}
   const m=/[?&]titik=(-?[\d.]+),(-?[\d.]+)/.exec(location.search);if(!m)return;
   const lat=+m[1],lon=+m[2];let best=null,bd=3;
   DATA.forEach(d=>{const k=km(lat,lon,d.lat,d.lon);if(k<bd){bd=k;best=d}});
   if(best){if(!inWindow(best)){state.win=168;syncWinButtons()}select(best.id,true)}
   else{map.flyTo([lat,lon],9);toast("Titik api di tautan ini sudah tidak ada di data terbaru.")}
 }
-function closeDetail(){state.sel=null;update()}
+function closeDetail(){if(state.sel!=null){state.sel=null}else{state.cview=null}update()}
+/* ---------- company view ---------- */
+const PROFILES=window.COMPANY_PROFILES||{};
+function companyData(name){
+  const shapes=CONC.filter(s=>s.company===name);
+  const area=shapes.reduce((a,s)=>a+(s.area||0),0);
+  const b=shapes.reduce((a,s)=>[Math.min(a[0],s.b[0]),Math.min(a[1],s.b[1]),Math.max(a[2],s.b[2]),Math.max(a[3],s.b[3])],[180,90,-180,-90]);
+  const provs=[...new Set(shapes.map(s=>{const p=findProv((s.b[0]+s.b[2])/2,(s.b[1]+s.b[3])/2);return p?p.name:null}).filter(Boolean))];
+  const cid=(shapes.find(s=>s.cid)||{}).cid||null;
+  const hot=filtered({ignoreComp:true,ignoreProv:true,ignoreCursor:true}).filter(d=>d.conc&&d.conc.company===name);
+  return {shapes,area,b,provs,cid,prof:cid?PROFILES[cid]:null,hot,type:(shapes[0]||{}).type,group:(shapes.find(s=>s.group)||{}).group};
+}
+function fmtUsd(m){return m==null?null:(m>=1000?"US$"+(m/1000).toLocaleString("id-ID",{maximumFractionDigits:1})+" miliar":"US$"+Math.round(m).toLocaleString("id-ID")+" juta")}
+function idxTicker(s){const m=/IDX:\s*([A-Z]{4})/.exec(s||"");return m?m[1]:null}
+function renderCompany(){
+  const el=$("detailView"),name=state.cview,c=companyData(name),P=c.prof;
+  const last=c.hot[0];
+  const sameGroup=c.cid?[...new Set(CONC.filter(s=>s.cid===c.cid&&s.company!==name).map(s=>s.company))]:[];
+  const grpHot={};filtered({ignoreComp:true,ignoreProv:true,ignoreCursor:true}).forEach(d=>{if(d.conc&&d.conc.cid&&d.conc.cid===c.cid&&d.conc.company!==name)grpHot[d.conc.company]=(grpHot[d.conc.company]||0)+1});
+  const grpList=Object.keys(grpHot).sort((a,b)=>grpHot[b]-grpHot[a]).slice(0,6);
+  const tk=P?idxTicker(P.ticker):null;
+  el.innerHTML='<div class="dhead"><button type="button" class="back" id="dBack">'+ICO.back+'Kembali</button><span class="caveat">Profil perusahaan</span></div>'+
+  '<div class="sec"><div class="cohead"><span class="tag">'+esc(c.type||"Pemegang konsesi")+'</span><h2 class="place">'+esc(name)+'</h2><span class="grp">'+(P?"Grup "+esc(P.group):c.group?"Grup "+esc(c.group):"Grup tidak tercatat")+(c.provs.length?" · "+esc(c.provs.join(", ")):"")+'</span></div>'+
+    '<div class="facts"><div class="fact"><span class="k">Titik api</span><span class="v" style="color:'+(c.hot.length?"var(--conf-h)":"var(--live)")+'">'+fmtNum(c.hot.length)+'</span><span class="s">'+winLabel(state.win)+'</span></div><div class="fact"><span class="k">Luas konsesi</span><span class="v">'+(c.area?fmtNum(Math.round(c.area))+' ha':'–')+'</span><span class="s">'+c.shapes.length+' area izin</span></div><div class="fact"><span class="k">Deteksi terakhir</span><span class="v">'+(last?relNow(last.ms):'–')+'</span><span class="s">'+(last?fmtTime(last.ms,last.off)+' '+last.zn:'tidak ada')+'</span></div></div>'+
+    '<div class="actions"><button type="button" class="btn primary" id="coMap">Lihat di peta</button><button type="button" class="btn" id="coShare">Bagikan</button></div></div>'+
+  (c.hot.length?'<div class="sec"><h2>Titik api terbaru <small>'+winLabel(state.win)+'</small></h2><div class="list">'+c.hot.slice(0,5).map(d=>'<button type="button" class="item" data-id="'+d.id+'"><span class="sw" style="background:'+frpColor(d.frp)+'"></span><span class="w"><b>'+esc(placeName(d))+'</b><span>'+esc(d.prov||"")+'</span></span><span class="r"><span class="tm">'+fmtTime(d.ms,d.off)+' '+d.zn+'</span><span class="ago">'+relNow(d.ms)+'</span>'+frpPill(d.frp)+'</span></button>').join("")+'</div>'+(c.hot.length>5?'<p class="caveat">'+fmtNum(c.hot.length-5)+' titik lain. Peta sudah disaring ke konsesi ini.</p>':'')+'</div>':'')+
+  '<div class="sec"><h2>Izin konsesi <small>'+c.shapes.length+' area</small></h2><ul class="permits">'+c.shapes.slice(0,8).map(s=>{const p=findProv((s.b[0]+s.b[2])/2,(s.b[1]+s.b[3])/2);return '<li><span>'+esc([s.permit||"Izin",p?p.name:null].filter(Boolean).join(" · "))+'<br><small style="color:var(--faint)">'+esc((s.src||"").replace("Indonesia Ministry of Forestry","Kementerian Kehutanan").replace("Indonesia Ministry of Environment and Forestry","KLHK"))+'</small></span><b>'+(s.area?fmtNum(Math.round(s.area))+' ha':'–')+'</b></li>'}).join("")+(c.shapes.length>8?'<li><span>+'+(c.shapes.length-8)+' area lain</span><b></b></li>':'')+'</ul></div>'+
+  (P?'<div class="sec"><h2>Profil grup <small>'+esc(P.short)+'</small></h2>'+
+     '<dl class="kv">'+
+      '<dt>Grup induk</dt><dd>'+esc(P.group)+'</dd>'+
+      '<dt>Status</dt><dd>'+esc(P.status)+(P.ticker?'<small>'+esc(P.ticker)+'</small>':'')+'</dd>'+
+      '<dt>Pemilik</dt><dd>'+esc(P.pemilik)+'<small>menurut laporan publik</small></dd>'+
+      (P.revenue_usd_m!=null?'<dt>Pendapatan</dt><dd>'+fmtUsd(P.revenue_usd_m)+(P.fy?' ('+esc(P.fy)+')':'')+(P.revenue_est?'<small>perkiraan</small>':'')+'</dd>':'')+
+      (P.planted_ha||P.landbank_ha?'<dt>Luas lahan grup</dt><dd>'+(P.planted_ha?fmtNum(P.planted_ha)+' ha tertanam':'')+(P.planted_ha&&P.landbank_ha?' · ':'')+(P.landbank_ha?fmtNum(P.landbank_ha)+' ha total':'')+'</dd>':'')+
+      (P.employees?'<dt>Karyawan</dt><dd>± '+fmtNum(P.employees)+'</dd>':'')+
+      (P.mills?'<dt>Pabrik</dt><dd>'+fmtNum(P.mills)+'</dd>':'')+
+      '<dt>Sertifikasi</dt><dd>'+esc(P.sertifikasi)+'</dd>'+
+      '<dt>Kebijakan nol deforestasi</dt><dd>'+esc(P.ndpe)+'</dd>'+
+     '</dl>'+
+     '<div class="blk"><h3>Riwayat kebakaran</h3><p class="prose">'+esc(P.kebakaran)+'</p></div>'+
+     '<div class="blk"><h3>Catatan dari laporan publik</h3><p class="prose">'+esc(P.laporan)+'</p></div>'+
+     (grpList.length?'<div class="blk"><h3>Perusahaan lain di grup ini dengan titik api</h3><div class="rows">'+grpList.map(n=>'<button type="button" class="prow" data-co="'+esc(n)+'"><span class="n">'+esc(n)+'</span><span class="c">'+fmtNum(grpHot[n])+'</span></button>').join("")+'</div></div>':(sameGroup.length?'<p class="caveat">'+sameGroup.length+' perusahaan lain di grup ini tidak memiliki titik api pada rentang ini.</p>':''))+
+     '<div class="blk"><h3>Sumber profil</h3><ol class="srclist">'+P.sources.map(u=>'<li><a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(u.replace(/^https?:\/\/(www\.)?/,"").slice(0,70))+'</a></li>').join("")+'<li><a href="https://github.com/handichan/borneo-sumatra-land-watch" target="_blank" rel="noopener">Indonesia Land Watch</a> (himpunan data), termasuk laporan WALHI 2026 “Siapa di Balik Api?”</li></ol></div></div>'
+   :'<div class="sec"><h2>Profil grup</h2><p class="prose">Profil grup untuk perusahaan ini belum tersedia di data kami. Nama perusahaan berasal dari data izin pemerintah yang dipublikasikan Global Forest Watch.</p></div>')+
+  '<div class="sec"><h2>Cek data resmi</h2><p class="prose">Susunan direksi, komisaris, dan pemegang saham resmi tercatat di <b>AHU Online</b> Kementerian Hukum. Cari dengan nama perusahaan di atas.</p><div class="actions"><a class="btn" href="https://ahu.go.id/pencarian/profil-pt" target="_blank" rel="noopener">Cari di AHU Online</a>'+(tk?'<a class="btn" href="https://www.idx.co.id/id/perusahaan-tercatat/profil-perusahaan-tercatat/'+tk+'" target="_blank" rel="noopener">Profil di IDX ('+tk+')</a>':'<a class="btn" href="https://www.globalforestwatch.org/map/" target="_blank" rel="noopener">Global Forest Watch</a>')+'</div>'+
+  '<div class="warnbox"><b>Penting:</b> titik api di area konsesi tidak membuktikan perusahaan menjadi penyebab kebakaran. Data izin sawit berasal dari 2012 dan HTI dari 2021, sehingga pemegang izin bisa sudah berganti. Profil grup dirangkum dari laporan publik yang dicantumkan.</div></div>';
+  el.hidden=false;showPanels(false);
+  $("dBack").onclick=closeDetail;
+  $("coMap").onclick=()=>{if(c.shapes.length)map.flyToBounds([[c.b[1],c.b[0]],[c.b[3],c.b[2]]],{padding:[40,40],maxZoom:10,duration:.7});if(innerWidth<=860)$("map").scrollIntoView({behavior:"smooth"})};
+  $("coShare").onclick=()=>{const url=location.origin+location.pathname+"?perusahaan="+encodeURIComponent(name);const text=name+": "+fmtNum(c.hot.length)+" titik api di area konsesinya dalam "+winLabel(state.win)+" (Pantau Karhutla).";if(navigator.share)navigator.share({title:name,text,url}).catch(()=>{});else copyText(text+" "+url,"Tautan disalin, siap dibagikan")};
+}
+function openCompany(name){
+  if(!name)return;state.sel=null;state.cview=name;
+  if(state.comp!==name){state.comp=name}
+  update();
+  const c=companyData(name);if(c.shapes.length)map.flyToBounds([[c.b[1],c.b[0]],[c.b[3],c.b[2]]],{padding:[40,40],maxZoom:10,duration:.7});
+  const side=$("side");if(innerWidth>860)side.scrollTop=0;else side.scrollIntoView({behavior:"smooth",block:"start"});
+}
 function showPanels(on){document.querySelectorAll(".panel").forEach(p=>p.hidden=!on||p.id!=="p-"+state.tab)}
 
 /* ---------- tabs ---------- */
 function showTab(t){
   state.tab=t;
-  if(state.sel!=null){state.sel=null;renderDetail()}
+  if(state.sel!=null||state.cview){state.sel=null;state.cview=null;renderDetail()}
   document.querySelectorAll(".tabs [role=tab]").forEach(b=>{const on=b.dataset.tab===t;b.setAttribute("aria-selected",on);b.tabIndex=on?0:-1});
   showPanels(true);
   const side=$("side");if(innerWidth>860)side.scrollTop=0;
@@ -1034,7 +1119,7 @@ function renderChips(){
 }
 function clearChip(k){
   if(k==="prov"||k==="all")state.prov=null;
-  if(k==="comp"||k==="all")state.comp=null;
+  if(k==="comp"||k==="all"){state.comp=null;state.cview=null}
   if(k==="conf"||k==="all"){state.conf="all";syncConfButtons()}
   if(k==="cursor"||k==="all"){state.cursor=null;stopPlay()}
   update();if(k!=="cursor"&&k!=="conf")map.flyToBounds(IDN_BOUNDS,{duration:.6});
@@ -1086,7 +1171,7 @@ function buildSearch(){
   const hot={},hotC={};DATA.forEach(d=>{if(d.prov)hot[d.prov]=(hot[d.prov]||0)+1;if(d.conc)hotC[d.conc.company]=(hotC[d.conc.company]||0)+1});
   const provs=[...new Set(PROV_SHAPES.map(p=>p.name))].map(n=>({ty:"Provinsi",label:n,sub:fmtNum(hot[n]||0)+" titik api",key:norm(n),rank:hot[n]||0,go:()=>{if(state.prov!==n)toggleProv(n,false)}}));
   const towns=TOWNS.map(t=>({ty:t[1].startsWith("Kota")?"Kota":"Kabupaten",label:t[1],sub:t[0],key:norm(t[1]+" "+t[0]),rank:0,go:()=>{map.flyTo([t[2],t[3]],9,{duration:.8});const n=DATA.filter(d=>inWindow(d)&&km(t[2],t[3],d.lat,d.lon)<=50).length;toast(fmtNum(n)+" titik api dalam radius 50 km dari "+t[0])}}));
-  const comps=[...new Set(CONC.map(s=>s.company))].map(c=>({ty:"Perusahaan",label:c,sub:(hotC[c]?fmtNum(hotC[c])+" titik api":"Tidak ada titik api")+" · "+winLabel(LOADED_HOURS),key:norm(c),rank:hotC[c]||0,go:()=>{if(state.comp!==c)toggleComp(c,false);showTab("perusahaan")}}));
+  const comps=[...new Set(CONC.map(s=>s.company))].map(c=>({ty:"Perusahaan",label:c,sub:(hotC[c]?fmtNum(hotC[c])+" titik api":"Tidak ada titik api")+" · "+winLabel(LOADED_HOURS),key:norm(c),rank:hotC[c]||0,go:()=>openCompany(c)}));
   SEARCH=provs.concat(towns,comps);
 }
 function runSearch(q){
@@ -1155,7 +1240,8 @@ $("side").addEventListener("click",e=>{
   if(e.target.closest("[data-near-clear]")){clearUser();return}
   const it=e.target.closest(".item,.gcard,.near li button");if(it){select(+it.dataset.id,true);return}
   const pr=e.target.closest("#rTable tr[data-prov]");if(pr){toggleProv(pr.dataset.prov,false);if(innerWidth<=860)$("map").scrollIntoView({behavior:"smooth"});return}
-  const cp=e.target.closest(".prow[data-comp]");if(cp){toggleComp(cp.dataset.comp,false);if(innerWidth<=860)$("map").scrollIntoView({behavior:"smooth"})}
+  const co=e.target.closest(".prow[data-co]");if(co){openCompany(co.dataset.co);return}
+  const cp=e.target.closest(".prow[data-comp]");if(cp){openCompany(cp.dataset.comp)}
 });
 $("rTable").addEventListener("keydown",e=>{if(e.key==="Enter"){const r=e.target.closest("tr[data-prov]");if(r)toggleProv(r.dataset.prov,false)}});
 $("chips").addEventListener("click",e=>{const b=e.target.closest("[data-chip]");if(b)clearChip(b.dataset.chip)});
@@ -1212,8 +1298,8 @@ async function fetchLive(days,keep){
     if(!r.ok||!j.rows)throw new Error(j.error||("HTTP "+r.status));
     if(!j.rows.length)throw new Error("FIRMS tidak mengembalikan titik api.");
     FETCHED_AT=Date.now();
-    const selId=state.sel;
-    loadData(j.rows.map(a=>({latitude:a[0],longitude:a[1],acq_date:a[2],acq_time:a[3],satellite:a[4],confidence:a[5],frp:a[6],daynight:a[7],n:a[8]})),{real:true,live:true,name:"NASA FIRMS"},{hours:(j.days||days||1)*24,keep:!!keep,deepLink:!liveOk});
+    const cur=DATA.find(d=>d.id===state.sel);const prevSel=cur?{lat:cur.lat,lon:cur.lon,ms:cur.ms}:null;
+    loadData(j.rows.map(a=>({latitude:a[0],longitude:a[1],acq_date:a[2],acq_time:a[3],satellite:a[4],confidence:a[5],frp:a[6],daynight:a[7],n:a[8]})),{real:true,live:true,name:"NASA FIRMS"},{hours:(j.days||days||1)*24,keep:!!keep,prevSel,deepLink:!liveOk});
     liveOk=true;return true;
   }catch(e){
     if(!liveOk&&SOURCE.archive){SOURCE.note="Data live belum tersedia ("+e.message+"). Menampilkan arsip terakhir.";renderSource();openDeepLink()}
@@ -1221,8 +1307,11 @@ async function fetchLive(days,keep){
   }finally{ld.hidden=true}
 }
 fetchLive(1);
-setInterval(()=>{if(!SOURCE.file&&state.sel==null&&!playTimer)fetchLive(Math.max(1,Math.ceil(LOADED_HOURS/24)),true)},15*60*1000);
-setInterval(()=>{if(SOURCE.live)renderSource()},60*1000);
+const REFRESH_MS=15*60*1000;let nextRefresh=Date.now()+REFRESH_MS,refreshPending=false;
+function refreshNow(){if(SOURCE.file)return;if(playTimer){refreshPending=true;return}refreshPending=false;nextRefresh=Date.now()+REFRESH_MS;fetchLive(Math.max(1,Math.ceil(LOADED_HOURS/24)),true)}
+setInterval(()=>{if(Date.now()>=nextRefresh)refreshNow();else if(refreshPending&&!playTimer)refreshNow()},20*1000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&FETCHED_AT&&Date.now()-FETCHED_AT>REFRESH_MS)refreshNow()});
+setInterval(()=>{if(SOURCE.live)renderSource()},30*1000);
 </script>
 </body>
 </html>
