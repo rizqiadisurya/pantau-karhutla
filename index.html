@@ -8,6 +8,10 @@
 <meta property="og:title" content="Pantau Karhutla">
 <meta property="og:description" content="Peta titik api karhutla Indonesia dari satelit NASA, diperbarui setiap 15 menit.">
 <meta name="theme-color" content="#181b20">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/icons/icon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
@@ -15,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<script>(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;document.querySelector('meta[name=theme-color]').content=t==="light"?"#fbfaf7":"#181b20"})()</script>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0}
@@ -42,8 +47,18 @@ img{max-width:100%}
   --font-display:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --font-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --font-mono:"Plus Jakarta Sans",system-ui,sans-serif;
+  --nb:#1a1d22; --nb-line:#2c3138; --prov-line:#3a4048; --prov-hover:#2a2f36; --prov-sel:#2d3239;
+  --dot-stroke:#1a0d04; --tl-dim:#5f4a3a; --on-accent:#1a0d04; --shadow:rgba(0,0,0,.5); --scrim:rgba(18,20,24,.85);
   --r:8px;
   --side:420px;
+}
+:root[data-theme=light]{
+  color-scheme:light;
+  --sea:#dcd8d0; --land:#f6f3ee; --panel:#fbfaf7; --panel-2:#f2efe9; --panel-3:#e9e5dd; --line:#ddd6ca;
+  --fg:#23272b; --muted:#565d65; --faint:#6c737a; --accent:#c4561f; --live:#21875d; --user:#2a7fd4;
+  --conc:#2e8577; --conc-fill:rgba(46,133,119,.10); --conf-l:#7d848b;
+  --nb:#ebe7df; --nb-line:#d3ccbf; --prov-line:#c4bcae; --prov-hover:#efe9df; --prov-sel:#f6e9dc;
+  --dot-stroke:#4a2408; --tl-dim:#e9cfbb; --on-accent:#fff; --shadow:rgba(60,48,36,.16); --scrim:rgba(251,250,247,.88);
 }
 html,body{height:100%}
 body{background:var(--sea);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;display:flex;flex-direction:column}
@@ -64,7 +79,7 @@ a{color:var(--accent)}
 .search input::placeholder{color:var(--faint)}
 .search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(243,154,92,.18)}
 .search .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint);pointer-events:none}
-.qres{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.5);padding:6px;list-style:none;margin:0;max-height:min(420px,60vh);overflow:auto}
+.qres{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 34px var(--shadow);padding:6px;list-style:none;margin:0;max-height:min(420px,60vh);overflow:auto}
 .qres li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:8px 10px;border-radius:6px;cursor:pointer}
 .qres li[aria-selected="true"],.qres li:hover{background:var(--panel-3)}
 .qres b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -94,7 +109,7 @@ a{color:var(--accent)}
 .leaflet-bar a{background:var(--panel)!important;color:var(--fg)!important;border-color:var(--line)!important;width:34px!important;height:34px!important;line-height:34px!important}
 .leaflet-bar a:hover{background:var(--panel-3)!important}
 .leaflet-bar a.home{display:grid!important;place-items:center}
-.leaflet-control-attribution{background:rgba(18,20,24,.8)!important;color:var(--faint)!important;font-size:10px}
+.leaflet-control-attribution{background:var(--scrim)!important;color:var(--faint)!important;font-size:10px}
 .leaflet-control-attribution a{color:var(--muted)!important}
 .leaflet-tooltip.ptip{background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;box-shadow:none;font-size:12px;padding:6px 8px}
 .leaflet-tooltip.ptip::before{display:none}
@@ -124,7 +139,7 @@ a{color:var(--accent)}
 
 /* layers popover */
 .layers{position:relative}
-.lpop{position:absolute;top:calc(100% + 6px);left:0;z-index:700;width:330px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 14px 34px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:12px}
+.lpop{position:absolute;top:calc(100% + 6px);left:0;z-index:700;width:330px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 14px 34px var(--shadow);display:flex;flex-direction:column;gap:12px}
 .lpop h3{margin:0;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:500}
 .bgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .bopt{border:1px solid var(--line);background:var(--panel-2);border-radius:8px;padding:0;cursor:pointer;display:flex;flex-direction:column;overflow:hidden;text-align:left}
@@ -286,9 +301,9 @@ a{color:var(--accent)}
 .gcard .gb span{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gcard .gb .co{color:var(--conc)}
 .badge{position:absolute;z-index:2;top:6px;left:6px;background:rgba(18,20,24,.85);color:var(--fg);font-size:11px;font-family:var(--font-mono);padding:2px 6px;border-radius:4px;border:1px solid var(--line)}
-.phpin{width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:8px;border:2px solid var(--accent);overflow:hidden;background:var(--panel);box-shadow:0 4px 14px rgba(0,0,0,.5);position:relative;cursor:pointer}
+.phpin{width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:8px;border:2px solid var(--accent);overflow:hidden;background:var(--panel);box-shadow:0 4px 14px var(--shadow);position:relative;cursor:pointer}
 .phpin img{width:100%;height:100%;object-fit:cover;display:block}
-.phpin b{position:absolute;right:2px;bottom:2px;background:var(--accent);color:#1a0d04;font-size:10px;font-weight:700;padding:0 4px;border-radius:3px;font-family:var(--font-mono)}
+.phpin b{position:absolute;right:2px;bottom:2px;background:var(--accent);color:var(--on-accent);font-size:10px;font-weight:700;padding:0 4px;border-radius:3px;font-family:var(--font-mono)}
 #map.far .phpin{width:44px;height:44px;margin:-22px 0 0 -22px}
 .upin{width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--user);border:3px solid #fff;box-shadow:0 0 0 6px rgba(94,184,255,.25)}
 
@@ -402,6 +417,10 @@ a{color:var(--accent)}
 .credit a{color:var(--fg);font-weight:600;text-decoration:none;border-bottom:1px solid var(--accent)}
 .credit a:hover,.credit a:focus-visible{color:var(--accent)}
 
+.themebtn{padding:7px 9px}
+.themebtn .i-moon{display:none}
+:root[data-theme=light] .themebtn .i-sun{display:none}
+:root[data-theme=light] .themebtn .i-moon{display:inline}
 /* ---------- Responsive ---------- */
 @media (max-width:1180px){:root{--side:380px}.brand p{display:none}}
 @media (max-width:860px){
@@ -450,6 +469,7 @@ a{color:var(--accent)}
   </div>
   <div class="top-act">
     <button type="button" class="btn" id="nearBtn" title="Cari titik api terdekat dari lokasi Anda" aria-label="Dekat saya: cari titik api terdekat dari lokasi Anda"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span class="nb-t">Dekat saya</span></button>
+    <button type="button" class="btn themebtn" id="themeBtn" aria-label="Ganti ke mode terang" title="Mode terang/gelap"><svg class="ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg><svg class="ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <button type="button" class="status" id="status" title="Tentang data"><span class="dot"></span><span><b id="statusMain">Memuat…</b> <span class="full" id="statusSub"></span></span></button>
   </div>
 </header>
@@ -728,6 +748,8 @@ function relNow(ms){const m=Math.round((Date.now()-ms)/60000);if(m<1)return"baru
 function winLabel(w){return w<24?w+" jam terakhir":w===24?"24 jam terakhir":(w/24)+" hari terakhir"}
 const FRP_HEX={1:"#ffd166",2:"#ff9f1c",3:"#ff5a1f",4:"#e5173f"};
 function frpLv(f){return f<5?1:f<20?2:f<60?3:4}
+const _cvCache={};function cv(n){const k=document.documentElement.dataset.theme+n;if(!(k in _cvCache))_cvCache[k]=getComputedStyle(document.documentElement).getPropertyValue(n).trim();return _cvCache[k]}
+function isLight(){return document.documentElement.dataset.theme==="light"}
 function frpHex(f){return FRP_HEX[frpLv(f)]}
 function frpColor(f){return "var(--frp"+frpLv(f)+")"}
 const FRP_LBL={1:"Kecil",2:"Sedang",3:"Besar",4:"Sangat besar"};
@@ -783,9 +805,9 @@ new HomeCtl().addTo(map);
 map.attributionControl.setPrefix(false);
 map.attributionControl.addAttribution("Batas wilayah: Natural Earth · Titik api: NASA FIRMS");
 const canvas=L.canvas({padding:.3});
-const nbLayer=L.geoJSON(NB,{interactive:false,style:{color:"#2c3138",weight:.6,fillColor:"#1a1d22",fillOpacity:1}}).addTo(map);
-const provLayer=L.geoJSON(IDN,{renderer:L.svg(),style:()=>({color:"#3a4048",weight:.8,fillColor:"#22262c",fillOpacity:1}),onEachFeature:(f,l)=>{const nm=PROV_ID[f.properties.name]||f.properties.name;l.bindTooltip(()=>{const c=filtered({ignoreProv:true}).filter(d=>d.prov===nm).length;const pp=popFor(nm),ii=ispaFor(nm);return "<b>"+nm+"</b><br>"+fmtNum(c)+" titik api"+(pp?"<br>Penduduk "+fmtJt(pp):"")+(ii!=null?"<br>ISPA "+fmtNum(ii)+" kasus":"")+"<br><span style='color:var(--faint)'>Klik untuk menyaring</span>"},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});l.on("click",()=>{toggleProv(nm,true)});l.on("mouseover",()=>{if(!(BASES[baseMode]||{}).tiles)l.setStyle({fillColor:"#2a2f36"})});l.on("mouseout",()=>styleProvs())}}).addTo(map);
-function styleProvs(){provLayer.eachLayer(l=>{const nm=PROV_ID[l.feature.properties.name]||l.feature.properties.name;const on=state.prov===nm;const B=BASES[baseMode]||{},tiles=!!B.tiles,fo=tiles?0:1;l.setStyle(on?{fillColor:"#2d3239",fillOpacity:tiles?.08:1,color:"#f39a5c",weight:2}:{fillColor:"#22262c",fillOpacity:fo,color:tiles?(B.light?"#5a6b6a":"#e4e6ea"):"#3a4048",weight:tiles?.7:.8,opacity:tiles?.55:1})})}
+const nbLayer=L.geoJSON(NB,{interactive:false,style:()=>({color:cv("--nb-line"),weight:.6,fillColor:cv("--nb"),fillOpacity:1})}).addTo(map);
+const provLayer=L.geoJSON(IDN,{renderer:L.svg(),style:()=>({color:cv("--prov-line"),weight:.8,fillColor:cv("--land"),fillOpacity:1}),onEachFeature:(f,l)=>{const nm=PROV_ID[f.properties.name]||f.properties.name;l.bindTooltip(()=>{const c=filtered({ignoreProv:true}).filter(d=>d.prov===nm).length;const pp=popFor(nm),ii=ispaFor(nm);return "<b>"+nm+"</b><br>"+fmtNum(c)+" titik api"+(pp?"<br>Penduduk "+fmtJt(pp):"")+(ii!=null?"<br>ISPA "+fmtNum(ii)+" kasus":"")+"<br><span style='color:var(--faint)'>Klik untuk menyaring</span>"},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});l.on("click",()=>{toggleProv(nm,true)});l.on("mouseover",()=>{if(!(BASES[baseMode]||{}).tiles)l.setStyle({fillColor:cv("--prov-hover")})});l.on("mouseout",()=>styleProvs())}}).addTo(map);
+function styleProvs(){provLayer.eachLayer(l=>{const nm=PROV_ID[l.feature.properties.name]||l.feature.properties.name;const on=state.prov===nm;const B=BASES[baseMode]||{},tiles=!!B.tiles,fo=tiles?0:1;l.setStyle(on?{fillColor:cv("--prov-sel"),fillOpacity:tiles?.08:1,color:cv("--accent"),weight:2}:{fillColor:cv("--land"),fillOpacity:fo,color:tiles?(B.light?"#5a6b6a":"#e4e6ea"):cv("--prov-line"),weight:tiles?.7:.8,opacity:tiles?.55:1})})}
 function latestImageDay(){return isoDay(Date.now()-5*3600e3)}
 function isoDay(ms){return new Date(ms).toISOString().slice(0,10)}
 function addDays(iso,n){return isoDay(Date.parse(iso+"T00:00:00Z")+n*864e5)}
@@ -821,7 +843,7 @@ map.setMaxBounds(IDN_BOUNDS.pad(.6));
 
 const concSvg=L.svg();
 let concLayer=L.layerGroup().addTo(map);
-function concStyle(s){const on=state.comp&&s.company===state.comp;return {renderer:concSvg,color:"#86aba5",weight:on?2:1,dashArray:on?null:"4 3",fillColor:"#86aba5",fillOpacity:on?.22:.08}}
+function concStyle(s){const on=state.comp&&s.company===state.comp;return {renderer:concSvg,color:cv("--conc"),weight:on?2:1,dashArray:on?null:"4 3",fillColor:cv("--conc"),fillOpacity:on?.22:.08}}
 function drawConc(){
   concLayer.clearLayers();
   if(!state.showConc)return;
@@ -852,7 +874,7 @@ function buildMarkers(){
   dotLayer.clearLayers();markerById.clear();
   $("map").classList.toggle("far",map.getZoom()<5.5);
   DATA.slice().sort((a,b)=>a.frp-b.frp).forEach(d=>{
-    const m=L.circleMarker([d.lat,d.lon],{renderer:canvas,radius:frpRadius(d.frp),color:"#1a0d04",weight:.6,fillColor:frpHex(d.frp),fillOpacity:.88});
+    const m=L.circleMarker([d.lat,d.lon],{renderer:canvas,radius:frpRadius(d.frp),color:cv("--dot-stroke"),weight:.6,fillColor:frpHex(d.frp),fillOpacity:.88});
     m.on("click",()=>select(d.id,false));
     m.bindTooltip(()=>"<b>"+esc(placeName(d))+"</b><br>"+fmtTime(d.ms,d.off)+" "+d.zn+" · "+relNow(d.ms)+"<br>Api "+FRP_LBL[frpLv(d.frp)].toLowerCase(),{className:"ptip",direction:"top",offset:[0,-4]});
     markerById.set(d.id,m);
@@ -1075,7 +1097,7 @@ async function loadWindGrid(){
   const r=await fetch(url);if(!r.ok)throw new Error("HTTP "+r.status);const j=await r.json();
   WIND={t:Date.now(),pts:j.map((p,i)=>({lat:lats[i],lon:lons[i],time:p.hourly.time,spd:p.hourly.wind_speed_10m,dir:p.hourly.wind_direction_10m}))};return WIND;
 }
-function windColor(k){return k<10?"#9fd8ff":k<20?"#c6f0ff":k<35?"#ffd166":"#ff9f1c"}
+function windColor(k){return isLight()?(k<10?"#4f8fc4":k<20?"#2b6ca8":k<35?"#c98a00":"#d0601a"):(k<10?"#9fd8ff":k<20?"#c6f0ff":k<35?"#ffd166":"#ff9f1c")}
 let windTok=0;
 async function drawWind(){
   const tok=++windTok;windLayer.clearLayers();if(!windOn)return;
@@ -1252,14 +1274,14 @@ function renderTimeline(){
   for(let i=0;i<S.n;i++){
     const hAll=(binsAll[i]/max)*(Ht-top-bot),hIn=(bins[i]/max)*(Ht-top-bot);
     const x=i*bw+(bw>4?1:0),w=Math.max(1,bw-(bw>4?2:.5));
-    if(binsAll[i])s+='<rect x="'+x.toFixed(1)+'" y="'+(Ht-bot-hAll).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+hAll.toFixed(1)+'" fill="#2e343c"/>';
-    if(bins[i]){const dim=state.cursor!=null&&S.start+i*S.step*3600e3>state.cursor;s+='<rect x="'+x.toFixed(1)+'" y="'+(Ht-bot-hIn).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+hIn.toFixed(1)+'" fill="'+(dim?"#5f4a3a":"#f39a5c")+'"/>'}
+    if(binsAll[i])s+='<rect x="'+x.toFixed(1)+'" y="'+(Ht-bot-hAll).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+hAll.toFixed(1)+'" fill="'+cv("--line")+'"/>';
+    if(bins[i]){const dim=state.cursor!=null&&S.start+i*S.step*3600e3>state.cursor;s+='<rect x="'+x.toFixed(1)+'" y="'+(Ht-bot-hIn).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+hIn.toFixed(1)+'" fill="'+(dim?cv("--tl-dim"):cv("--accent"))+'"/>'}
   }
-  s+='<line x1="0" x2="'+W+'" y1="'+(Ht-bot+.5)+'" y2="'+(Ht-bot+.5)+'" stroke="#2e343c"/>';
+  s+='<line x1="0" x2="'+W+'" y1="'+(Ht-bot+.5)+'" y2="'+(Ht-bot+.5)+'" stroke="'+cv("--line")+'"/>';
   const ticks=S.span<=24?[0,6,12,18,24].map(h=>[h,fmtTime(S.start+h*3600e3,7)]):Array.from({length:S.span/24+1},(_,k)=>[k*24,k===S.span/24?fmtTime(LATEST,7):fmtShortDate(S.start+k*24*3600e3,7)]).filter((_,k,a)=>S.span<=72||k%2===0||k===a.length-1);
-  ticks.forEach(([h,lab])=>{const x=Math.min(W-16,Math.max(16,h/S.span*W));s+='<text x="'+x.toFixed(1)+'" y="'+(Ht-2)+'" fill="#a4aab3" font-size="10" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">'+lab+'</text>'});
-  if(state.win<S.span)s+='<rect x="0" y="0" width="'+((S.span-state.win)/S.span*W).toFixed(1)+'" height="'+(Ht-bot)+'" fill="#121418" opacity=".55"/>';
-  if(state.cursor!=null){const x=(state.cursor-S.start)/(S.span*3600e3)*W;s+='<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="0" y2="'+(Ht-bot)+'" stroke="#e4e6ea" stroke-width="1.5"/>'}
+  ticks.forEach(([h,lab])=>{const x=Math.min(W-16,Math.max(16,h/S.span*W));s+='<text x="'+x.toFixed(1)+'" y="'+(Ht-2)+'" fill="'+cv("--muted")+'" font-size="10" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">'+lab+'</text>'});
+  if(state.win<S.span)s+='<rect x="0" y="0" width="'+((S.span-state.win)/S.span*W).toFixed(1)+'" height="'+(Ht-bot)+'" fill="'+cv("--panel")+'" opacity=".55"/>';
+  if(state.cursor!=null){const x=(state.cursor-S.start)/(S.span*3600e3)*W;s+='<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="0" y2="'+(Ht-bot)+'" stroke="'+cv("--fg")+'" stroke-width="1.5"/>'}
   svg.setAttribute("viewBox","0 0 "+W+" "+Ht);svg.innerHTML=s;
   $("tlLabel").textContent="Jumlah deteksi per "+(S.step===1?"jam":S.step+" jam")+" (WIB)";
   const n=bins.reduce((a,b)=>a+b,0);
@@ -1361,6 +1383,13 @@ $("nearBtn").onclick=locate;
 $("status").onclick=()=>showTab("info");
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&state.sel!=null&&document.activeElement!==$("q"))closeDetail()});
 window.addEventListener("resize",()=>renderTimeline());
+function setTheme(t,save){document.documentElement.dataset.theme=t;if(save){try{localStorage.setItem("theme",t)}catch(e){}}
+  document.querySelector('meta[name=theme-color]').content=cv("--panel");
+  const tb=$("themeBtn");tb.setAttribute("aria-label",t==="light"?"Ganti ke mode gelap":"Ganti ke mode terang");
+  nbLayer.setStyle(()=>({color:cv("--nb-line"),weight:.6,fillColor:cv("--nb"),fillOpacity:1}));styleProvs();if(DATA.length)update();if(windOn)drawWind()}
+$("themeBtn").onclick=()=>setTheme(isLight()?"dark":"light",true);
+setTheme(document.documentElement.dataset.theme,false);
+try{matchMedia("(prefers-color-scheme: light)").addEventListener("change",e=>{let t=null;try{t=localStorage.getItem("theme")}catch(_){}if(!t)setTheme(e.matches?"light":"dark",false)})}catch(e){}
 
 /* layers popover */
 function toggleLayers(open){const p=$("lpop");const o=open??p.hidden;if(o)buildBaseGrid();p.hidden=!o;$("layBtn").setAttribute("aria-expanded",o)}
