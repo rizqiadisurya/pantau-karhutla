@@ -349,6 +349,18 @@ a{color:var(--accent)}
 .cohead .tag{display:inline-flex;align-self:flex-start;gap:6px;align-items:center;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--conc);border:1px solid var(--conc);border-radius:999px;padding:2px 9px}
 .cohead h2.place{font-family:var(--font-body)!important;letter-spacing:0!important;text-transform:none!important;color:var(--fg)!important;font-size:21px!important;line-height:1.25}
 .cohead .grp{color:var(--muted);font-size:13px}
+.cohead.wl{display:grid;grid-template-columns:60px minmax(0,1fr);gap:14px;align-items:start}
+.cohead .cotx{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cologo{width:60px;height:60px;border-radius:14px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden;text-decoration:none}
+.cologo img{max-width:48px;max-height:48px;object-fit:contain}
+.cologo.ini{background:var(--panel-3);color:var(--muted);font-weight:800;font-size:19px;letter-spacing:.02em}
+.logocap{font-size:11px;color:var(--faint);margin-top:2px}
+.gal{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(160px,48%);gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}
+.gal a{scroll-snap-align:start;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--panel-2);text-decoration:none;color:var(--fg)}
+.gal img{width:100%;height:116px;object-fit:cover;display:block;background:var(--panel-3)}
+.gal span{display:block;padding:7px 9px;font-size:11.5px;color:var(--muted);line-height:1.35}
+.lnkrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.lnkrow .btn{text-decoration:none;font-size:12.5px;padding:6px 10px}
 .kv{display:grid;grid-template-columns:132px minmax(0,1fr);gap:8px 14px;font-size:13px;margin:0}
 .kv dt{color:var(--faint)}
 .kv dd{margin:0;min-width:0;color:var(--fg)}
@@ -664,6 +676,7 @@ a{color:var(--accent)}
 <script src="data/archive.js?v=20261026c"></script>
 <script src="data/health.js?v=20261026c"></script>
 <script src="data/companies.js?v=20261026c"></script>
+<script src="data/media.js?v=20261102a"></script>
 <script>
 const IDN = window.IDN_GEO;
 const NB = window.NB_GEO;
@@ -1197,10 +1210,18 @@ function renderCompany(){
   const grpHot={};filtered({ignoreComp:true,ignoreProv:true,ignoreCursor:true}).forEach(d=>{if(d.conc&&d.conc.cid&&d.conc.cid===c.cid&&d.conc.company!==name)grpHot[d.conc.company]=(grpHot[d.conc.company]||0)+1});
   const grpList=Object.keys(grpHot).sort((a,b)=>grpHot[b]-grpHot[a]).slice(0,6);
   const tk=P?idxTicker(P.ticker):null;
+  const M=(c.cid&&window.COMPANY_MEDIA&&window.COMPANY_MEDIA[c.cid])||null;
+  const ini=name.replace(/^(PT|CV|Perum|PD)\.?\s+/i,"").split(/\s+/).filter(w=>/[A-Za-z]/.test(w)).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+  const logoHtml=M&&M.logo?'<a class="cologo" href="'+M.logo.page+'" target="_blank" rel="noopener" title="Logo '+esc(M.logoOf)+' · sumber: '+esc(M.logo.by)+'"><img src="'+M.logo.src+'" alt="Logo '+esc(M.logoOf)+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add(\'ini\');this.parentNode.textContent=\''+ini+'\'"></a>':'<div class="cologo ini" aria-hidden="true">'+esc(ini)+'</div>';
+  const gq=encodeURIComponent((P?P.short:name)+" kantor");
+  const galHtml='<div class="sec"><h2>Galeri &amp; tautan <small>'+(M&&M.photos&&M.photos.length?M.photos.length+' foto':'')+'</small></h2>'+
+    (M&&M.photos&&M.photos.length?'<div class="gal">'+M.photos.map(ph=>{const x=window.COMPANY_MEDIA_C(ph.f);return '<a href="'+x.page+'" target="_blank" rel="noopener"><img src="'+x.src.replace("width=240","width=480")+'" alt="'+esc(ph.cap)+'" loading="lazy" referrerpolicy="no-referrer"><span>'+esc(ph.cap)+'</span></a>'}).join("")+'</div><p class="caveat">Foto dari Wikimedia Commons (lisensi bebas). Klik untuk melihat pemotret &amp; lisensi.'+(P?' Foto menunjukkan grup/induk, belum tentu kantor '+esc(name)+'.':'')+'</p>'
+      :'<p class="caveat">Belum ada foto berlisensi bebas untuk perusahaan ini. Lihat foto kantor dan lokasinya lewat Google Maps.</p>')+
+    '<div class="lnkrow">'+(M&&M.web?'<a class="btn" href="'+M.web+'" target="_blank" rel="noopener">Situs resmi ↗</a>':'')+'<a class="btn" href="https://www.google.com/maps/search/'+gq+'" target="_blank" rel="noopener">Foto kantor di Google Maps ↗</a></div></div>';
   el.innerHTML='<div class="dhead"><button type="button" class="back" id="dBack">'+ICO.back+'Kembali</button><span class="caveat">Profil perusahaan</span></div>'+
-  '<div class="sec"><div class="cohead"><span class="tag">'+esc(c.type||"Pemegang konsesi")+'</span><h2 class="place">'+esc(name)+'</h2><span class="grp">'+(P?"Grup "+esc(P.group):c.group?"Grup "+esc(c.group):"Grup tidak tercatat")+(c.provs.length?" · "+esc(c.provs.join(", ")):"")+'</span></div>'+
+  '<div class="sec"><div class="cohead wl">'+logoHtml+'<div class="cotx"><span class="tag">'+esc(c.type||"Pemegang konsesi")+'</span><h2 class="place">'+esc(name)+'</h2><span class="grp">'+(P?"Grup "+esc(P.group):c.group?"Grup "+esc(c.group):"Grup tidak tercatat")+(c.provs.length?" · "+esc(c.provs.join(", ")):"")+'</span>'+(M&&M.logo?'<span class="logocap">Logo: '+esc(M.logoOf)+'</span>':'')+'</div></div>'+
     '<div class="facts"><div class="fact"><span class="k">Titik api</span><span class="v" style="color:'+(c.hot.length?"var(--conf-h)":"var(--live)")+'">'+fmtNum(c.hot.length)+'</span><span class="s">'+winLabel(state.win)+'</span></div><div class="fact"><span class="k">Luas konsesi</span><span class="v">'+(c.area?fmtNum(Math.round(c.area))+' ha':'–')+'</span><span class="s">'+c.shapes.length+' area izin</span></div><div class="fact"><span class="k">Deteksi terakhir</span><span class="v">'+(last?relNow(last.ms):'–')+'</span><span class="s">'+(last?fmtTime(last.ms,last.off)+' '+last.zn:'tidak ada')+'</span></div></div>'+
-    '<div class="actions"><button type="button" class="btn primary" id="coMap">Lihat di peta</button><button type="button" class="btn" id="coShare">Bagikan</button></div></div>'+
+    '<div class="actions"><button type="button" class="btn primary" id="coMap">Lihat di peta</button><button type="button" class="btn" id="coShare">Bagikan</button></div></div>'+galHtml+
   (c.hot.length?'<div class="sec"><h2>Titik api terbaru <small>'+winLabel(state.win)+'</small></h2><div class="list">'+c.hot.slice(0,5).map(d=>'<button type="button" class="item" data-id="'+d.id+'"><span class="sw" style="background:'+frpColor(d.frp)+'"></span><span class="w"><b>'+esc(placeName(d))+'</b><span>'+esc(d.prov||"")+'</span></span><span class="r"><span class="tm">'+fmtTime(d.ms,d.off)+' '+d.zn+'</span><span class="ago">'+relNow(d.ms)+'</span>'+frpPill(d.frp)+'</span></button>').join("")+'</div>'+(c.hot.length>5?'<p class="caveat">'+fmtNum(c.hot.length-5)+' titik lain. Peta sudah disaring ke konsesi ini.</p>':'')+'</div>':'')+
   '<div class="sec"><h2>Izin konsesi <small>'+c.shapes.length+' area</small></h2><ul class="permits">'+c.shapes.slice(0,8).map(s=>{const p=findProv((s.b[0]+s.b[2])/2,(s.b[1]+s.b[3])/2);return '<li><span>'+esc([s.permit||"Izin",p?p.name:null].filter(Boolean).join(" · "))+'<br><small style="color:var(--faint)">'+esc((s.src||"").replace("Indonesia Ministry of Forestry","Kementerian Kehutanan").replace("Indonesia Ministry of Environment and Forestry","KLHK"))+'</small></span><b>'+(s.area?fmtNum(Math.round(s.area))+' ha':'–')+'</b></li>'}).join("")+(c.shapes.length>8?'<li><span>+'+(c.shapes.length-8)+' area lain</span><b></b></li>':'')+'</ul></div>'+
   (P?'<div class="sec"><h2>Profil grup <small>'+esc(P.short)+'</small></h2>'+
