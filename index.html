@@ -104,6 +104,7 @@ a{color:var(--accent)}
 .layout{flex:1;display:grid;grid-template-columns:minmax(0,1fr) var(--side);min-height:0}
 .mapwrap{position:relative;min-height:0;min-width:0}
 #map{position:absolute;inset:0;background:var(--sea)}
+.leaflet-interactive:focus,.leaflet-container path:focus{outline:none}
 .leaflet-container{background:var(--sea);font-family:var(--font-body)}
 .leaflet-bar{border:1px solid var(--line)!important;box-shadow:none!important}
 .leaflet-bar a{background:var(--panel)!important;color:var(--fg)!important;border-color:var(--line)!important;width:34px!important;height:34px!important;line-height:34px!important}
@@ -421,6 +422,7 @@ a{color:var(--accent)}
 .themebtn .i-moon{display:none}
 :root[data-theme=light] .themebtn .i-sun{display:none}
 :root[data-theme=light] .themebtn .i-moon{display:inline}
+.csw.sel{border:2px solid var(--accent)!important;background:color-mix(in srgb,var(--accent) 30%,transparent)!important}
 /* ---------- Responsive ---------- */
 @media (max-width:1180px){:root{--side:380px}.brand p{display:none}}
 @media (max-width:860px){
@@ -525,6 +527,7 @@ a{color:var(--accent)}
         </div></div>
         <div class="ln"><span class="ring"></span>Baru terdeteksi (≤ 2 jam)</div>
         <div class="ln"><span class="csw"></span>Area konsesi perusahaan</div>
+        <div class="ln" id="lgSel" hidden><span class="csw sel"></span>Konsesi yang dipilih</div>
         <div class="ln" id="lgWind" hidden><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h11M8 2l5 4-5 4" fill="none" stroke="#9fd8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Arah angin (makin panjang makin kencang)</div>
         <div class="ln" id="lgUser" hidden><span class="usw"></span>Lokasi Anda</div>
       </div>
@@ -843,7 +846,7 @@ map.setMaxBounds(IDN_BOUNDS.pad(.6));
 
 const concSvg=L.svg();
 let concLayer=L.layerGroup().addTo(map);
-function concStyle(s){const on=state.comp&&s.company===state.comp;return {renderer:concSvg,color:cv("--conc"),weight:on?2:1,dashArray:on?null:"4 3",fillColor:cv("--conc"),fillOpacity:on?.22:.08}}
+function concStyle(s){const on=state.comp&&s.company===state.comp,dim=state.comp&&!on;return on?{renderer:concSvg,color:cv("--accent"),weight:2.5,opacity:1,dashArray:null,fillColor:cv("--accent"),fillOpacity:.28}:{renderer:concSvg,color:cv("--conc"),weight:1,opacity:dim?.35:1,dashArray:"4 3",fillColor:cv("--conc"),fillOpacity:dim?.02:.08}}
 function drawConc(){
   concLayer.clearLayers();
   if(!state.showConc)return;
@@ -854,7 +857,7 @@ function drawConc(){
     s.layer=lyr;concLayer.addLayer(lyr);
   });
 }
-function styleConc(){CONC.forEach(s=>s.layer&&s.layer.setStyle(concStyle(s)))}
+function styleConc(){CONC.forEach(s=>{if(!s.layer)return;s.layer.setStyle(concStyle(s));if(state.comp&&s.company===state.comp&&s.layer.bringToFront)s.layer.bringToFront()});const lg=document.getElementById("lgSel");if(lg)lg.hidden=!state.comp}
 function loadConc(fc,src){
   CONC=buildConc(fc);CONC_SRC=src;
   CONC_BY_ID=new Map(CONC.filter(s=>s.pid).map(s=>[s.pid,s]));
