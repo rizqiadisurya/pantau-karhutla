@@ -79,7 +79,9 @@ $("airBox").addEventListener("click",e=>{const b=e.target.closest("[data-aq]");i
 const airLayer=L.layerGroup();
 function drawAir(){
   airLayer.clearLayers();if(!airOn||!AQ)return;
-  AQ.pts.forEach(p=>{const v=p.d[airK];const q=ispu(v);if(!q)return;
+  const kept=[],gap=innerWidth<=860?30:34;
+  AQ.pts.filter(p=>p.d[airK]!=null).sort((a,b)=>b.d[airK]-a.d[airK]).forEach(p=>{const pt=map.latLngToContainerPoint([p.t[2],p.t[3]]);if(kept.some(k=>Math.abs(k.x-pt.x)<gap&&Math.abs(k.y-pt.y)<gap))return;kept.push(pt);
+    const v=p.d[airK];const q=ispu(v);if(!q)return;
     L.marker([p.t[2],p.t[3]],{keyboard:false,icon:L.divIcon({className:"",iconSize:[0,0],html:'<div class="aqm q-'+q.v+' '+q.v+'">'+Math.round(v)+'</div>'})})
      .bindTooltip('<b>'+esc(p.t[0])+'</b> · '+esc(p.t[1])+'<br>PM2.5 '+fmtPm(v)+' — <b>'+q.lbl+'</b><br><span style="color:var(--faint)">'+(airK===0?"Rata-rata 24 jam terakhir":"Prakiraan rata-rata "+(airK===1?"besok":"lusa"))+'</span>',{className:"ptip",direction:"top",offset:[0,-14]}).addTo(airLayer)});
 }
@@ -90,6 +92,7 @@ function setAir(on){
   if($("aqMap"))$("aqMap").textContent=on?"Sembunyikan dari peta":"Tampilkan di peta";
 }
 $("swAir").onclick=()=>setAir(!airOn);
+map.on("zoomend",()=>{if(airOn)drawAir()});
 document.querySelectorAll("[data-ak]").forEach(b=>b.onclick=()=>{airK=+b.dataset.ak;document.querySelectorAll("[data-ak]").forEach(x=>x.setAttribute("aria-pressed",x===b));drawAir()});
 
 /* =====================================================================
