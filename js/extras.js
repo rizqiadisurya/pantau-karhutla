@@ -289,7 +289,7 @@ async function makeCard(){
   const rr=state.prov?5:3.2;list.slice().sort((a,b)=>a.frp-b.frp).forEach(d=>{const [px,py]=P(d.lon,d.lat);g.beginPath();g.arc(px,py,rr,0,Math.PI*2);g.fillStyle=frpHex(d.frp);g.globalAlpha=.9;g.fill()});g.globalAlpha=1;
   g.restore();
   // top provinces
-  const by={};list.forEach(d=>{if(d.prov)by[d.prov]=(by[d.prov]||0)+1});const top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,state.prov?0:5);
+  const by={};list.forEach(d=>{if(d.prov)by[d.prov]=(by[d.prov]||0)+1});const top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,state.prov?0:4);
   let y=915;
   if(top.length){g.fillStyle=col("--faint");g.font=F(700,24);g.fillText(window.PK_LANG==="en"?"MOST HOTSPOTS IN":"TERBANYAK DI",64,y);y+=42;const mx=top[0][1];
     top.forEach(([n,v])=>{g.fillStyle=col("--fg");g.font=F(600,30);g.fillText(n,64,y);g.textAlign="right";g.fillText(fmtNum(v),1016,y);g.textAlign="left";
