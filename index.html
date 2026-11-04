@@ -435,6 +435,89 @@ a{color:var(--accent)}
 :root[data-theme=light] .themebtn .i-sun{display:none}
 :root[data-theme=light] .themebtn .i-moon{display:inline}
 .csw.sel{border:2px solid var(--accent)!important;background:color-mix(in srgb,var(--accent) 30%,transparent)!important}
+/* ---------- Fitur tambahan ---------- */
+:root{--ispu1:#3fae49;--ispu2:#3b82f6;--ispu3:#e8b400;--ispu4:#e5484d;--ispu5:#5b1a1a;--fd1:#3b82f6;--fd2:#3fae49;--fd3:#e8b400;--fd4:#e5484d;--peat:#6872b5}
+.scale{display:inline-flex;border-radius:3px;overflow:hidden;flex:none}.scale i{width:9px;height:9px;display:block}
+.legend .psw{width:13px;height:9px;background:var(--peat);opacity:.8;flex:none}
+.legend .wsw{width:12px;height:12px;border-radius:50%;border:2px dashed var(--accent);flex:none}
+.chip-q{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 8px;color:#fff;white-space:nowrap}
+.chip-q.ispu3,.chip-q.fd3{color:#2a2000}
+.q-ispu1{background:var(--ispu1)}.q-ispu2{background:var(--ispu2)}.q-ispu3{background:var(--ispu3)}.q-ispu4{background:var(--ispu4)}.q-ispu5{background:var(--ispu5)}
+.q-fd1{background:var(--fd1)}.q-fd2{background:var(--fd2)}.q-fd3{background:var(--fd3)}.q-fd4{background:var(--fd4)}
+.q-ispu3,.q-fd3{color:#2a2000!important}
+.aqlist{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.aqrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:7px 2px;border-bottom:1px solid var(--line);font-size:13px;background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;color:var(--fg);width:100%}
+.aqrow small{display:block;color:var(--faint);font-size:11.5px}
+.aqrow .pm{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12.5px;text-align:right}
+.advice{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-size:13px;line-height:1.5}
+.advice b{display:block;margin-bottom:2px}
+.aqm{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:#fff;font-size:11px;font-weight:800;border:2px solid rgba(255,255,255,.85);box-shadow:0 2px 6px rgba(0,0,0,.35);transform:translate(-50%,-50%);font-variant-numeric:tabular-nums}
+.aqm.ispu3{color:#2a2000}
+.rstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.rstrip span{height:22px;border-radius:4px;display:grid;place-items:center;font-size:10.5px;font-weight:800;color:#fff}
+.rstrip span.fd3{color:#2a2000}
+.rdays{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;font-size:10.5px;color:var(--faint);text-align:center;margin-bottom:3px}
+.rtab{width:100%;border-collapse:collapse;font-size:12.5px}
+.rtab td,.rtab th{padding:5px 4px;border-bottom:1px solid var(--line);text-align:left;font-weight:500}
+.rtab th{color:var(--faint);font-size:11px;font-weight:600}
+.rtab td.c{width:30px;padding:3px 1px}.rtab td.c span{display:grid;place-items:center;height:22px;border-radius:4px;font-size:10px;font-weight:800;color:#fff}
+.rtab td.c span.fd3{color:#2a2000}
+.rtab tr[data-prov]{cursor:pointer}.rtab tr[data-prov]:hover td{background:var(--panel-2)}
+.sos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:4px}
+.sosb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);text-decoration:none;color:var(--fg);text-align:center}
+.sosb b{font-size:20px;font-weight:800;color:var(--conf-h)}.sosb span{font-size:11px;color:var(--muted);line-height:1.25}
+.sosb:hover{border-color:var(--conf-h)}
+.modal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);display:grid;place-items:center;padding:16px}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 20px 60px var(--shadow)}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:1}
+.mhead h2{margin:0;font-size:16px;font-weight:700}
+.mclose{background:none;border:0;font-size:24px;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+#mBody{padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px}
+#mBody img.cardprev{width:100%;border-radius:10px;border:1px solid var(--line)}
+.fld{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.fld>span{color:var(--muted);font-size:12px;font-weight:600}
+.fld select,.fld input[type=text]{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:9px 10px;color:var(--fg);font:inherit}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:13px}.chk input{margin-top:3px}
+textarea.code{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:9px;color:var(--fg);font:12px/1.45 ui-monospace,Menlo,monospace;resize:vertical}
+.watchcard{display:flex;flex-direction:column;gap:8px}
+.watchcard .wh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.watchcard .big{font-size:26px;font-weight:800;line-height:1}
+.watchcard .big.hot{color:var(--conf-h)}
+.newpill{display:inline-block;background:var(--conf-h);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+.peatline{margin-top:10px;font-size:13px;color:var(--muted)}.peatline b{color:var(--fg)}
+.peatbox{margin-top:8px;padding:9px 11px;border-radius:10px;border:1px solid var(--peat);background:color-mix(in srgb,var(--peat) 14%,transparent);font-size:13px}
+.minibars{display:flex;align-items:flex-end;gap:3px;height:70px;margin-top:6px}
+.minibars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;height:100%}
+.minibars i{display:block;width:100%;background:var(--accent);border-radius:3px 3px 0 0;min-height:1px}
+.minibars i.z{background:var(--line)}
+.minibars span{font-size:9.5px;color:var(--faint)}
+.chart{width:100%;display:block}
+.tsel{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--fg);font:inherit;font-size:13px;max-width:100%}
+.kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.kpi div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--panel-2)}
+.kpi .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.kpi .v{font-size:22px;font-weight:800;margin-top:2px}
+.kpi .s{font-size:12px;color:var(--muted)}
+.up{color:var(--conf-h)}.down{color:var(--live)}
+.lgd{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--muted);margin-top:6px}.lgd i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.rank{display:flex;flex-direction:column}
+.rank button{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 2px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);text-align:left;cursor:pointer;font:inherit;font-size:13px}
+.rank button:hover{background:var(--panel-2)}
+.rank .no{color:var(--faint);font-size:12px;text-align:right}
+.rank small{display:block;color:var(--faint);font-size:11.5px}
+.rank .bar{height:4px;border-radius:2px;background:var(--accent);margin-top:4px;opacity:.75}
+.rank .n{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+.yrs{display:flex;gap:2px;margin-top:4px}.yrs i{width:9px;height:9px;border-radius:2px;background:var(--line)}.yrs i.on{background:var(--conf-h)}
+html.embed .top,html.embed .side,html.embed #layBtn+.lpop+*{display:none!important}
+html.embed body{height:100%}
+html.embed .layout{display:block;height:100%}
+html.embed .mapwrap{height:100vh!important;min-height:0!important}
+html.embed .layers,html.embed #chips{display:none}
+.embedbar{position:fixed;right:10px;top:10px;z-index:1000}
+.embedbar a{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;color:var(--fg);text-decoration:none;box-shadow:0 4px 14px var(--shadow)}
+.embedbar a b{color:var(--accent)}
+html.embed .toolbar{right:150px}
+
 /* ---------- Responsive ---------- */
 @media (max-width:1180px){:root{--side:380px}.brand p{display:none}}
 @media (max-width:860px){
@@ -509,6 +592,9 @@ a{color:var(--accent)}
               <div class="trow"><span>Foto kebakaran<small>Foto satelit 8 area api terbesar</small></span><button type="button" class="switch" role="switch" id="swPhoto" aria-checked="true" aria-label="Foto kebakaran"></button></div>
               <div class="trow"><span>Batas konsesi perusahaan<small>Kebun sawit &amp; hutan tanaman industri</small></span><button type="button" class="switch" role="switch" id="swConc" aria-checked="true" aria-label="Batas konsesi perusahaan"></button></div>
               <div class="trow"><span>Arah angin<small>Panah menunjuk ke mana angin (dan asap) bertiup</small></span><button type="button" class="switch" role="switch" id="swWind" aria-checked="false" aria-label="Arah angin"></button></div>
+              <div class="trow"><span>Kualitas udara (PM2.5)<small>Tingkat polusi asap per kota, skala ISPU</small></span><button type="button" class="switch" role="switch" id="swAir" aria-checked="false" aria-label="Kualitas udara"></button></div>
+              <div class="trow"><span>Bahaya kebakaran<small>Prakiraan 7 hari dari kondisi cuaca</small></span><button type="button" class="switch" role="switch" id="swRisk" aria-checked="false" aria-label="Bahaya kebakaran"></button></div>
+              <div class="trow"><span>Lahan gambut<small>Sebaran gambut (Miettinen dkk. 2016, via GFW)</small></span><button type="button" class="switch" role="switch" id="swPeat" aria-checked="false" aria-label="Lahan gambut"></button></div>
             </div>
             <div>
               <h3>Tingkat keyakinan deteksi</h3>
@@ -523,6 +609,8 @@ a{color:var(--accent)}
           </div>
         </div>
         <div class="seg windctl" id="windCtl" role="group" aria-label="Waktu peta angin" hidden><span class="lbl">Angin</span><button type="button" data-wk="0" aria-pressed="true">Sekarang</button><button type="button" data-wk="1" aria-pressed="false">Besok</button><button type="button" data-wk="2" aria-pressed="false">Lusa</button><button type="button" data-wk="3" aria-pressed="false">+3 hari</button></div>
+        <div class="seg windctl" id="airCtl" role="group" aria-label="Waktu peta kualitas udara" hidden><span class="lbl">Udara</span><button type="button" data-ak="0" aria-pressed="true">Sekarang</button><button type="button" data-ak="1" aria-pressed="false">Besok</button><button type="button" data-ak="2" aria-pressed="false">Lusa</button></div>
+        <div class="seg windctl" id="riskCtl" role="group" aria-label="Hari prakiraan bahaya kebakaran" hidden><span class="lbl">Bahaya</span></div>
         <span class="loading" id="loading" hidden><span class="spin"></span><span id="loadingTxt">Memuat data…</span></span>
       </div>
       <div class="chips" id="chips" aria-live="polite"></div>
@@ -541,6 +629,10 @@ a{color:var(--accent)}
         <div class="ln"><span class="csw"></span>Area konsesi perusahaan</div>
         <div class="ln" id="lgSel" hidden><span class="csw sel"></span>Konsesi yang dipilih</div>
         <div class="ln" id="lgWind" hidden><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h11M8 2l5 4-5 4" fill="none" stroke="#9fd8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Arah angin (makin panjang makin kencang)</div>
+        <div class="ln" id="lgAir" hidden><span class="scale"><i style="background:var(--ispu1)"></i><i style="background:var(--ispu2)"></i><i style="background:var(--ispu3)"></i><i style="background:var(--ispu4)"></i><i style="background:var(--ispu5)"></i></span>Udara: baik → berbahaya</div>
+        <div class="ln" id="lgRisk" hidden><span class="scale"><i style="background:var(--fd1)"></i><i style="background:var(--fd2)"></i><i style="background:var(--fd3)"></i><i style="background:var(--fd4)"></i></span>Bahaya: rendah → ekstrem</div>
+        <div class="ln" id="lgPeat" hidden><span class="psw"></span>Lahan gambut</div>
+        <div class="ln" id="lgWatch" hidden><span class="wsw"></span>Area pantauan Anda</div>
         <div class="ln" id="lgUser" hidden><span class="usw"></span>Lokasi Anda</div>
       </div>
     </details>
@@ -557,6 +649,7 @@ a{color:var(--accent)}
       <button type="button" role="tab" id="tab-wilayah" aria-controls="p-wilayah" aria-selected="false" data-tab="wilayah">Wilayah</button>
       <button type="button" role="tab" id="tab-perusahaan" aria-controls="p-perusahaan" aria-selected="false" data-tab="perusahaan">Perusahaan<span class="sr" id="cntComp"></span></button>
       <button type="button" role="tab" id="tab-titik" aria-controls="p-titik" aria-selected="false" data-tab="titik">Titik api <span class="cnt" id="cntList"></span></button>
+      <button type="button" role="tab" id="tab-tren" aria-controls="p-tren" aria-selected="false" data-tab="tren">Tren</button>
       <button type="button" role="tab" id="tab-info" aria-controls="p-info" aria-selected="false" data-tab="info">Info</button>
     </div>
 
@@ -574,6 +667,9 @@ a{color:var(--accent)}
           <div class="stat clickable" data-go="perusahaan" title="Lihat per perusahaan"><div class="k">Di area konsesi</div><div class="v" id="sConc">–</div><div class="s" id="sConcTop">–</div></div>
         </div>
       </div>
+      <div class="sec" id="watchSec"></div>
+      <div class="sec" id="airSec"><h2>Kualitas udara <small id="airAsOf"></small></h2><div id="airBox"><p class="hint">Memuat kualitas udara…</p></div></div>
+      <div class="sec" id="riskSec"><h2>Bahaya kebakaran <small id="riskAsOf">prakiraan 7 hari</small></h2><div id="riskBox"><p class="hint">Menghitung prakiraan bahaya kebakaran…</p></div></div>
       <div class="sec" id="healthSec">
         <h2>Dampak kesehatan <small id="hChecked"></small></h2>
         <div class="stats">
@@ -586,6 +682,21 @@ a{color:var(--accent)}
         <h2>Foto satelit terbaru <small id="galDate"></small></h2>
         <div class="gallery" id="gallery"></div>
         <p class="caveat">Foto warna asli satelit NOAA-20 (±375 m per piksel) dari NASA. Titik merah = api, kabut putih kecokelatan = asap. Klik foto untuk detail.</p>
+      </div>
+      <div class="sec">
+        <h2>Bagikan ringkasan</h2>
+        <p class="lead" style="font-size:13px">Buat gambar ringkasan titik api hari ini, siap dikirim ke WhatsApp, Instagram, atau media sosial lain.</p>
+        <div class="actions" style="grid-template-columns:1fr 1fr"><button type="button" class="btn primary" id="cardBtn">Buat gambar ringkasan</button><button type="button" class="btn" id="csvBtn2">Unduh data (CSV)</button></div>
+      </div>
+      <div class="sec" id="sosSec">
+        <h2>Darurat &amp; lapor kebakaran</h2>
+        <div class="sos">
+          <a href="tel:112" class="sosb"><b>112</b><span>Layanan darurat</span></a>
+          <a href="tel:113" class="sosb"><b>113</b><span>Pemadam kebakaran</span></a>
+          <a href="tel:119" class="sosb"><b>119</b><span>Ambulans / medis</span></a>
+          <a href="tel:117" class="sosb"><b>117</b><span>BNPB (bencana)</span></a>
+        </div>
+        <p class="caveat">Melihat api atau asap tebal? Hubungi 112 atau 113. Laporkan juga ke BPBD atau posko Manggala Agni setempat. Jangan mendekati api sendiri.</p>
       </div>
     </div>
 
@@ -601,6 +712,10 @@ a{color:var(--accent)}
         <p class="lead" style="font-size:13px">Klik provinsi untuk menyaring peta. Angka ISPA dari Kemenkes, penduduk dari Dukcapil.</p>
         <div class="tscroll"><table class="rtable" id="rTable"></table></div>
         <p class="caveat" id="hNote"></p>
+      </div>
+      <div class="sec" id="riskProvSec">
+        <h2>Bahaya kebakaran per provinsi <small>7 hari</small></h2>
+        <div id="riskProv"><p class="hint">Menghitung…</p></div>
       </div>
     </div>
 
@@ -621,9 +736,14 @@ a{color:var(--accent)}
             <button type="button" data-lsort="new" aria-pressed="true">Terbaru</button>
             <button type="button" data-lsort="big" aria-pressed="false">Terbesar</button>
           </div>
+          <button type="button" class="btn" id="csvBtn" style="padding:5px 10px;font-size:12.5px" title="Unduh daftar titik api sesuai saringan sebagai CSV">Unduh CSV</button>
         </div>
         <div class="list" id="list"></div>
       </div>
+    </div>
+
+    <div class="panel" role="tabpanel" id="p-tren" aria-labelledby="tab-tren" hidden>
+      <div id="trenBox"><div class="sec"><p class="hint">Memuat arsip tren…</p></div></div>
     </div>
 
     <div class="panel" role="tabpanel" id="p-info" aria-labelledby="tab-info" hidden>
@@ -643,6 +763,19 @@ a{color:var(--accent)}
           <details><summary>Apakah lokasi saya disimpan?</summary><p>Tidak. Fitur “Dekat saya” menghitung jarak di perangkat Anda sendiri. Lokasi tidak dikirim ke server mana pun.</p></details>
         </div>
       </div>
+      <div class="sec" id="installSec">
+        <h2>Pasang di HP &amp; peringatan</h2>
+        <p class="lead" style="font-size:13px">Pasang Pantau Karhutla seperti aplikasi agar cepat dibuka, tetap tampil saat sinyal lemah, dan bisa memberi notifikasi titik api baru di sekitar lokasi yang Anda pantau.</p>
+        <div class="actions" style="grid-template-columns:1fr 1fr"><button type="button" class="btn primary" id="installBtn">Pasang aplikasi</button><button type="button" class="btn" id="watchBtn2">Atur peringatan lokasi</button></div>
+        <p class="caveat" id="installNote"></p>
+      </div>
+      <div class="sec">
+        <h2>Sematkan peta di situs Anda</h2>
+        <p class="lead" style="font-size:13px">Untuk media dan organisasi: tempelkan kode ini di halaman Anda. Peta selalu menampilkan data terbaru.</p>
+        <div class="seg" role="group" aria-label="Wilayah peta sematan" id="embedSeg" style="margin:8px 0"><button type="button" data-emb="all" aria-pressed="true">Seluruh Indonesia</button><button type="button" data-emb="prov" aria-pressed="false">Provinsi terpilih</button></div>
+        <textarea id="embedCode" class="code" rows="4" readonly></textarea>
+        <div class="actions" style="grid-template-columns:1fr 1fr"><button type="button" class="btn" id="embedCopy">Salin kode</button><a class="btn" id="embedPrev" href="/?embed=1" target="_blank" rel="noopener">Lihat contoh ↗</a></div>
+      </div>
       <div class="sec">
         <h2>Sumber data</h2>
         <ul class="srcs">
@@ -651,6 +784,10 @@ a{color:var(--accent)}
           <li><a href="https://www.globalforestwatch.org/" target="_blank" rel="noopener">Global Forest Watch</a> — batas konsesi sawit (Kemenhut 2012) &amp; HTI (KLHK 2021); nama grup dari <a href="https://github.com/handichan/borneo-sumatra-land-watch" target="_blank" rel="noopener">Indonesia Land Watch</a>.</li>
           <li>Kemenkes RI — kasus ISPA; Ditjen Dukcapil — jumlah penduduk (rincian di tab Wilayah).</li>
           <li><a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> — arah angin &amp; prakiraan cuaca (model cuaca global, CC BY 4.0). Untuk peringatan resmi, lihat <a href="https://www.bmkg.go.id/" target="_blank" rel="noopener">BMKG</a>.</li>
+          <li><a href="https://open-meteo.com/en/docs/air-quality-api" target="_blank" rel="noopener">Open-Meteo Air Quality</a> — PM2.5 dari model <a href="https://atmosphere.copernicus.eu/" target="_blank" rel="noopener">CAMS Copernicus</a> (CC BY 4.0), dikategorikan dengan batas ISPU (Permen LHK No. 14/2020). Untuk ISPU resmi, lihat <a href="https://ispu.kemenlh.go.id/" target="_blank" rel="noopener">ISPU KLHK</a>.</li>
+          <li>Prakiraan bahaya kebakaran — indeks sederhana Pantau Karhutla dari hari tanpa hujan, kelembapan, suhu, dan angin (Open-Meteo). Bukan FDRS resmi; lihat <a href="https://www.bmkg.go.id/" target="_blank" rel="noopener">BMKG</a>.</li>
+          <li><a href="https://data.globalforestwatch.org/" target="_blank" rel="noopener">Global Forest Watch</a> — peta lahan gambut (Miettinen dkk. 2016, CC BY 4.0).</li>
+          <li>Arsip NASA FIRMS VIIRS S-NPP (sejak 2015) — statistik tren di tab Tren.</li>
           <li>Natural Earth — batas wilayah; Esri — peta dasar satelit, terrain &amp; jalan.</li>
         </ul>
       </div>
@@ -669,6 +806,8 @@ a{color:var(--accent)}
   </aside>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
+<div class="modal" id="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mTitle"><div class="mhead"><h2 id="mTitle"></h2><button type="button" class="mclose" id="mClose" aria-label="Tutup">×</button></div><div id="mBody"></div></div></div>
+<div class="embedbar" id="embedBar" hidden><a href="/" target="_blank" rel="noopener" id="embedLink">Buka <b>Pantau Karhutla</b> ↗</a></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="data/geo.js?v=20261026c"></script>
@@ -683,6 +822,7 @@ const NB = window.NB_GEO;
 const SAMPLE = window.ARCHIVE_FIRES;
 const REAL_CONC = window.CONC_DATA;
 const $=id=>document.getElementById(id);
+const HOOKS={};function onHook(n,f){(HOOKS[n]||(HOOKS[n]=[])).push(f)}function HOOK(n,...a){(HOOKS[n]||[]).forEach(f=>{try{f(...a)}catch(e){console.error("hook "+n,e)}})}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 const ICO={x:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width:12px;height:12px"><path d="M6 6l12 12M18 6 6 18"/></svg>',back:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',home:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg>'};
 
@@ -820,7 +960,8 @@ const HomeCtl=L.Control.extend({options:{position:"topright"},onAdd(){const c=L.
 new HomeCtl().addTo(map);
 map.attributionControl.setPrefix(false);
 map.attributionControl.addAttribution("Batas wilayah: Natural Earth · Titik api: NASA FIRMS");
-const canvas=L.canvas({padding:.3});
+map.createPane("peat").style.zIndex=405;map.getPane("peat").style.pointerEvents="none";map.createPane("concp").style.zIndex=430;map.createPane("fire").style.zIndex=450;
+const canvas=L.canvas({padding:.3,pane:"fire"});
 const nbLayer=L.geoJSON(NB,{interactive:false,style:()=>({color:cv("--nb-line"),weight:.6,fillColor:cv("--nb"),fillOpacity:1})}).addTo(map);
 const provLayer=L.geoJSON(IDN,{renderer:L.svg(),style:()=>({color:cv("--prov-line"),weight:.8,fillColor:cv("--land"),fillOpacity:1}),onEachFeature:(f,l)=>{const nm=PROV_ID[f.properties.name]||f.properties.name;l.bindTooltip(()=>{const c=filtered({ignoreProv:true}).filter(d=>d.prov===nm).length;const pp=popFor(nm),ii=ispaFor(nm);return "<b>"+nm+"</b><br>"+fmtNum(c)+" titik api"+(pp?"<br>Penduduk "+fmtJt(pp):"")+(ii!=null?"<br>ISPA "+fmtNum(ii)+" kasus":"")+"<br><span style='color:var(--faint)'>Klik untuk menyaring</span>"},{sticky:true,className:"ptip",direction:"top",offset:[0,-6]});l.on("click",()=>{toggleProv(nm,true)});l.on("mouseover",()=>{if(!(BASES[baseMode]||{}).tiles)l.setStyle({fillColor:cv("--prov-hover")})});l.on("mouseout",()=>styleProvs())}}).addTo(map);
 function styleProvs(){provLayer.eachLayer(l=>{const nm=PROV_ID[l.feature.properties.name]||l.feature.properties.name;const on=state.prov===nm;const B=BASES[baseMode]||{},tiles=!!B.tiles,fo=tiles?0:1;l.setStyle(on?{fillColor:cv("--prov-sel"),fillOpacity:tiles?.08:1,color:cv("--accent"),weight:2}:{fillColor:cv("--land"),fillOpacity:fo,color:tiles?(B.light?"#5a6b6a":"#e4e6ea"):cv("--prov-line"),weight:tiles?.7:.8,opacity:tiles?.55:1})})}
@@ -857,7 +998,7 @@ const IDN_BOUNDS=L.latLngBounds([[-11.2,94.8],[6.2,141.2]]);
 map.fitBounds(IDN_BOUNDS,{padding:[10,10]});
 map.setMaxBounds(IDN_BOUNDS.pad(.6));
 
-const concSvg=L.svg();
+const concSvg=L.svg({pane:"concp"});
 let concLayer=L.layerGroup().addTo(map);
 function concStyle(s){const on=state.comp&&s.company===state.comp,dim=state.comp&&!on;return on?{renderer:concSvg,color:cv("--accent"),weight:2.5,opacity:1,dashArray:null,fillColor:cv("--accent"),fillOpacity:.28}:{renderer:concSvg,color:cv("--conc"),weight:1,opacity:dim?.35:1,dashArray:"4 3",fillColor:cv("--conc"),fillOpacity:dim?.02:.08}}
 function drawConc(){
@@ -1170,6 +1311,7 @@ function renderDetail(){
   $("dCopy").onclick=()=>copyText(coord,"Koordinat disalin");
   $("dShare").onclick=()=>shareHotspot(d);
   fillWx(d);
+  HOOK("detail",d);
   if(selMark)map.removeLayer(selMark);
   selMark=L.marker([d.lat,d.lon],{interactive:false,keyboard:false,zIndexOffset:1500,icon:L.divIcon({className:"",iconSize:[0,0],html:'<div class="selpulse"></div>'})}).addTo(map);
 }
@@ -1247,6 +1389,7 @@ function renderCompany(){
   $("dBack").onclick=closeDetail;
   $("coMap").onclick=()=>{if(c.shapes.length)map.flyToBounds([[c.b[1],c.b[0]],[c.b[3],c.b[2]]],{padding:[40,40],maxZoom:10,duration:.7});if(innerWidth<=860)$("map").scrollIntoView({behavior:"smooth"})};
   $("coShare").onclick=()=>{const url=location.origin+location.pathname+"?perusahaan="+encodeURIComponent(name);const text=name+": "+fmtNum(c.hot.length)+" titik api di area konsesinya dalam "+winLabel(state.win)+" (Pantau Karhutla).";if(navigator.share)navigator.share({title:name,text,url}).catch(()=>{});else copyText(text+" "+url,"Tautan disalin, siap dibagikan")};
+  HOOK("company",name,c);
 }
 function openCompany(name){
   if(!name)return;state.sel=null;state.cview=name;
@@ -1359,6 +1502,7 @@ function update(){
   const list=filtered();
   if(state.sel!=null&&!DATA.some(d=>d.id===state.sel))state.sel=null;
   renderMap(list);renderSummary(list);renderNear();renderRegions();renderComps();renderList(list);renderDetail();renderPhotos();renderTimeline();renderChips();styleProvs();styleConc();
+  HOOK("update",list);
 }
 function toggleComp(name,fromMap){
   state.comp=state.comp===name?null:name;state.sel=null;update();
@@ -1410,7 +1554,7 @@ window.addEventListener("resize",()=>renderTimeline());
 function setTheme(t,save){document.documentElement.dataset.theme=t;if(save){try{localStorage.setItem("theme",t)}catch(e){}}
   document.querySelector('meta[name=theme-color]').content=cv("--panel");
   const tb=$("themeBtn");tb.setAttribute("aria-label",t==="light"?"Ganti ke mode gelap":"Ganti ke mode terang");
-  nbLayer.setStyle(()=>({color:cv("--nb-line"),weight:.6,fillColor:cv("--nb"),fillOpacity:1}));styleProvs();if(DATA.length)update();if(windOn)drawWind()}
+  nbLayer.setStyle(()=>({color:cv("--nb-line"),weight:.6,fillColor:cv("--nb"),fillOpacity:1}));styleProvs();if(DATA.length)update();if(windOn)drawWind();HOOK("theme",t)}
 $("themeBtn").onclick=()=>setTheme(isLight()?"dark":"light",true);
 setTheme(document.documentElement.dataset.theme,false);
 try{matchMedia("(prefers-color-scheme: light)").addEventListener("change",e=>{let t=null;try{t=localStorage.getItem("theme")}catch(_){}if(!t)setTheme(e.matches?"light":"dark",false)})}catch(e){}
@@ -1467,7 +1611,7 @@ async function fetchLive(days,keep){
     FETCHED_AT=Date.now();
     const cur=DATA.find(d=>d.id===state.sel);const prevSel=cur?{lat:cur.lat,lon:cur.lon,ms:cur.ms}:null;
     loadData(j.rows.map(a=>({latitude:a[0],longitude:a[1],acq_date:a[2],acq_time:a[3],satellite:a[4],confidence:a[5],frp:a[6],daynight:a[7],n:a[8]})),{real:true,live:true,name:"NASA FIRMS"},{hours:(j.days||days||1)*24,keep:!!keep,prevSel,deepLink:!liveOk});
-    liveOk=true;return true;
+    liveOk=true;HOOK("data");return true;
   }catch(e){
     if(!liveOk&&SOURCE.archive){SOURCE.note="Data live belum tersedia ("+e.message+"). Menampilkan arsip terakhir.";renderSource();openDeepLink()}
     return false;
@@ -1480,6 +1624,7 @@ setInterval(()=>{if(Date.now()>=nextRefresh)refreshNow();else if(refreshPending&
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&FETCHED_AT&&Date.now()-FETCHED_AT>REFRESH_MS)refreshNow()});
 setInterval(()=>{if(SOURCE.live)renderSource()},30*1000);
 </script>
+<script src="js/extras.js?v=20261104a"></script>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
