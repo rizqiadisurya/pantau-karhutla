@@ -11,6 +11,13 @@ Peta titik panas kebakaran hutan dan lahan (karhutla) di Indonesia. Titik panas 
 | `data/geo.js` | Batas provinsi Indonesia dan negara tetangga |
 | `data/concessions.js` | Batas konsesi sawit & HTI beserta nama perusahaan |
 | `data/archive.js` | Arsip titik panas (dipakai bila data live gagal diambil) |
+| `api/hist.js` | Arsip FIRMS VIIRS S-NPP untuk statistik tren (dipakai saat membangun `data/trend.js`) |
+| `api/citra.js`, `api/tile.js` | Proxy foto satelit NASA GIBS |
+| `js/extras.js` | Kualitas udara, bahaya kebakaran, lahan gambut, peringatan lokasi, kartu bagikan, CSV, sematan, PWA, tab Tren |
+| `js/i18n.js` | Versi Bahasa Inggris (tombol EN/ID) |
+| `data/trend.js` | Rekap titik api per bulan/provinsi/konsesi sejak 2015 |
+| `data/companies.js`, `data/companies_en.js`, `data/media.js` | Profil grup perusahaan (ID/EN), logo & galeri |
+| `sw.js`, `site.webmanifest` | Agar bisa dipasang di HP (PWA) |
 | `vercel.json` | Pengaturan Vercel |
 
 ## Langkah 1 — Minta kunci API FIRMS (gratis, 2 menit)
@@ -55,6 +62,21 @@ npx vercel --prod               # deploy ulang dengan kunci terpasang
 - **Konsesi:** kebun sawit (HGU/IUP, Kementerian Kehutanan 2012) dan hutan tanaman industri (PBPH-HT, KLHK 2021), dipublikasikan Global Forest Watch; nama grup dari repositori Indonesia Land Watch (github.com/handichan/borneo-sumatra-land-watch).
 - **Batas wilayah:** Natural Earth.
 - **Citra satelit:** Esri World Imagery.
+
+## Fitur
+
+- Peta titik api live (6 jam–7 hari), foto satelit, peta dasar, arah angin, cuaca & prakiraan 5 hari.
+- **Kualitas udara**: PM2.5 per kota (model CAMS via Open-Meteo) dengan kategori ISPU dan saran kesehatan.
+- **Bahaya kebakaran**: indeks sederhana 7 hari dari hari tanpa hujan, kelembapan, suhu, dan angin.
+- **Lahan gambut**: lapisan peta GFW (Miettinen dkk. 2016) dan penanda titik api di gambut.
+- **Peringatan lokasi**: notifikasi browser bila ada titik api baru dalam radius pilihan (disimpan di perangkat).
+- **Tren**: perbandingan tahunan/bulanan sejak 2015, konsesi dengan titik api terbanyak, dan konsesi yang terbakar berulang.
+- **Berbagi**: gambar ringkasan untuk media sosial, unduh CSV, kode sematan `?embed=1` (opsional `&provinsi=`).
+- Mode terang/gelap, versi Bahasa Inggris (`?lang=en`), bisa dipasang di HP.
+
+## Memperbarui arsip tren
+
+`data/trend.js` dibangun dari `api/hist.js` (per 5 hari, VIIRS S-NPP). Jalankan pelan-pelan (±1 permintaan per 10 detik): kunci FIRMS punya batas transaksi per 10 menit, dan kalau terlampaui data live di situs ikut gagal sementara.
 
 ## Catatan penting
 
