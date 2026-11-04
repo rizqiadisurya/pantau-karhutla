@@ -1,5 +1,5 @@
 // Pantau Karhutla service worker: app shell offline, data selalu dari jaringan.
-const VERSION = "pk-20261104a";
+const VERSION = "pk-20261104b";
 const SHELL = ["/", "/favicon.svg", "/favicon-32.png", "/icon-192.png", "/site.webmanifest"];
 const STATIC_HOSTS = ["cdnjs.cloudflare.com", "fonts.googleapis.com", "fonts.gstatic.com"];
 

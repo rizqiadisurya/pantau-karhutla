@@ -164,7 +164,7 @@ const P=[
 [new RegExp("^(\\d+) provinsi terdampak · Kemenkes$"),"$1 provinces affected · Ministry of Health"],[new RegExp("^"+N+" balita$"),"$1 under-fives"],[new RegExp("^± "+N+"/hari$"),"± $1/day"],
 [/^([\d]+),(\d) juta$/,"$1.$2 million"],[/^([\d]+),(\d) jt(.*)$/,(m,a,b,c)=>a+"."+b+" M"+T(c)],[/^ ?\(termasuk (.+)\)$/,(m,a)=>" (incl. "+a+")"],
 [/^(.+) · (\d+) (jam|menit|hari) lalu$/,(m,a,b,c)=>T(a)+" · "+b+(c==="jam"?" h ago":c==="menit"?" min ago":" days ago")],
-[/^(\d+) (jam|menit|hari) lalu(.*)$/,(m,b,c,r)=>b+(c==="jam"?" h ago":c==="menit"?" min ago":" days ago")+T(r)],[/^baru saja$/,"just now"],
+[/^(\d+) (jam|menit|hari) lalu(.*)$/,(m,b,c,r)=>b+(c==="jam"?" h ago":c==="menit"?" min ago":" days ago")+T(r)],[/^baru saja$/,"just now"],[/^(\d+),(\d)rb$/,"$1.$2k"],[/^(\d+)rb$/,"$1k"],
 [/^(\d+) jam terakhir$/,"last $1 hours"],[/^(\d+) hari terakhir$/,"last $1 days"],
 [/^Menampilkan (\d+) dari (.+) titik\. Saring per provinsi atau pakai pencarian untuk mempersempit\.$/,"Showing $1 of $2 hotspots. Filter by province or use search to narrow it down."],
 [/^(.+) · ± (\d+) km dari (.+)$/,"$1 · ± $2 km from $3"],[/^± (\d+) km dari (.+)$/,"± $1 km from $2"],[/^Koordinat (.+)$/,"Coordinates $1"],
