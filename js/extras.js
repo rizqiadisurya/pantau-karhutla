@@ -123,7 +123,7 @@ function loadRisk(){
   return riskP;
 }
 function provRiskVal(pr,k){const d=pr.days[k];return d?(pr.n>=3?d.p75:d.max):null}
-function riskStrip(vals){return '<div class="rdays">'+vals.map((_,k)=>'<span>'+(k===0?"Hr ini":k===1?"Besok":dayLabel(k).split(" ")[0])+'</span>').join("")+'</div><div class="rstrip">'+vals.map(v=>{const f=fdOf(v);return f?'<span class="q-'+f.v+' '+f.v+'" title="'+f.lbl+' (skor '+v+')">'+f.lbl[0]+'</span>':'<span style="background:var(--line)"></span>'}).join("")+'</div>'}
+function riskStrip(vals){return '<div class="rwrap"><div class="rdays">'+vals.map((_,k)=>'<span>'+(k===0?"Ini":k===1?"Bsk":dayLabel(k).split(" ")[0])+'</span>').join("")+'</div><div class="rstrip">'+vals.map(v=>{const f=fdOf(v);return f?'<span class="q-'+f.v+' '+f.v+'" title="'+f.lbl+' (skor '+v+')">'+f.lbl[0]+'</span>':'<span style="background:var(--line)"></span>'}).join("")+'</div>'+'</div>'}
 function renderRisk(){
   const box=$("riskBox"),pbox=$("riskProv");if(!box)return;
   if(!RISK){box.innerHTML='<p class="hint">Menghitung prakiraan bahaya kebakaran…</p>';if(pbox)pbox.innerHTML='<p class="hint">Menghitung…</p>';return}
@@ -256,7 +256,7 @@ function checkWatch(){
   const hits=watchHits(),keys=hits.map(hotKey),seen=new Set(WATCH.seen||[]);
   const nw=hits.filter(d=>!seen.has(hotKey(d)));
   WATCH.seen=keys;WATCH.fresh=nw.length?nw.map(hotKey):(WATCH.fresh||[]).filter(k=>keys.includes(k));LS.set("pk_watch",WATCH);
-  if(nw.length&&WATCH.notify){const d=nw[0];notify(nw.length+" titik api baru dekat "+WATCH.label,(nw.length>1?"Terdekat: ":"")+placeName(d)+", ± "+Math.round(km(WATCH.lat,WATCH.lon,d.lat,d.lon))+" km, pukul "+fmtTime(d.ms,d.off)+" "+d.zn+".",location.origin+"/?titik="+d.lat.toFixed(4)+","+d.lon.toFixed(4))}
+  if(nw.length&&WATCH.notify){const d=nw[0],EN=window.PK_LANG==="en";notify(nw.length+(EN?" new hotspot"+(nw.length>1?"s":"")+" near ":" titik api baru dekat ")+WATCH.label,(nw.length>1?(EN?"Closest: ":"Terdekat: "):"")+placeName(d)+", ± "+Math.round(km(WATCH.lat,WATCH.lon,d.lat,d.lon))+" km, "+(EN?"at ":"pukul ")+fmtTime(d.ms,d.off)+" "+d.zn+".",location.origin+"/?titik="+d.lat.toFixed(4)+","+d.lon.toFixed(4))}
   renderWatch();
 }
 
@@ -267,7 +267,7 @@ async function makeCard(){
   try{await document.fonts.load('800 60px "Plus Jakarta Sans"');await document.fonts.load('500 30px "Plus Jakarta Sans"')}catch(e){}
   const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
   const F=(w,s)=>w+" "+s+'px "Plus Jakarta Sans", system-ui, sans-serif';
-  const col=n=>cv(n);
+  const col=n=>cv(n);const _=s=>window.PK_T?window.PK_T(s):s;
   g.fillStyle=col("--sea");g.fillRect(0,0,W,H);
   const list=filtered();
   // header
@@ -275,7 +275,7 @@ async function makeCard(){
   g.fillStyle=col("--muted");g.font=F(500,28);g.fillText(fmtDate(Date.now(),7)+" · "+fmtTime(Date.now(),7)+" WIB",64,122);
   // big number
   g.fillStyle=col("--fg");g.font=F(800,150);g.fillText(fmtNum(list.length),60,175);
-  g.fillStyle=col("--muted");g.font=F(500,34);g.fillText("titik api terdeteksi "+(state.comp?"di konsesi "+(state.comp.length>34?state.comp.slice(0,33)+"…":state.comp):"di "+(state.prov||"Indonesia")),64,340);g.fillText("dalam "+winLabel(state.win),64,382);
+  g.fillStyle=col("--muted");g.font=F(500,34);const EN=window.PK_LANG==="en";const where=state.comp?(EN?"in the concession of ":"di konsesi ")+(state.comp.length>34?state.comp.slice(0,33)+"…":state.comp):(EN?"in ":"di ")+(state.prov||"Indonesia");g.fillText((EN?"hotspots detected ":"titik api terdeteksi ")+where,64,340);g.fillText((EN?"in the ":"dalam ")+winLabel(state.win),64,382);
   // map
   const box={x:40,y:450,w:1000,h:430};const b=state.prov?(PROV_SHAPES.filter(s=>s.name===state.prov).reduce((a,s)=>[Math.min(a[0],s.b[0]),Math.min(a[1],s.b[1]),Math.max(a[2],s.b[2]),Math.max(a[3],s.b[3])],[180,90,-180,-90])):[95,-11,141.2,6];
   const sc=Math.min(box.w/(b[2]-b[0]),box.h/(b[3]-b[1]));const ox=box.x+(box.w-(b[2]-b[0])*sc)/2,oy=box.y+(box.h-(b[3]-b[1])*sc)/2;
@@ -288,11 +288,11 @@ async function makeCard(){
   // top provinces
   const by={};list.forEach(d=>{if(d.prov)by[d.prov]=(by[d.prov]||0)+1});const top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,state.prov?0:5);
   let y=915;
-  if(top.length){g.fillStyle=col("--faint");g.font=F(700,24);g.fillText("TERBANYAK DI",64,y);y+=42;const mx=top[0][1];
+  if(top.length){g.fillStyle=col("--faint");g.font=F(700,24);g.fillText(window.PK_LANG==="en"?"MOST HOTSPOTS IN":"TERBANYAK DI",64,y);y+=42;const mx=top[0][1];
     top.forEach(([n,v])=>{g.fillStyle=col("--fg");g.font=F(600,30);g.fillText(n,64,y);g.textAlign="right";g.fillText(fmtNum(v),1016,y);g.textAlign="left";
       g.fillStyle=col("--line");g.fillRect(64,y+40,952,8);g.fillStyle=col("--accent");g.fillRect(64,y+40,952*v/mx,8);y+=66})}
-  else{const conc=list.filter(d=>d.conc).length;g.fillStyle=col("--fg");g.font=F(600,32);g.fillText(fmtNum(conc)+" titik di area konsesi perusahaan",64,y+10);
-    const big=list.slice().sort((a,b)=>b.frp-a.frp)[0];if(big){g.fillText("Api terbesar: "+Math.round(big.frp)+" MW di "+placeName(big),64,y+60)}}
+  else{const conc=list.filter(d=>d.conc).length;g.fillStyle=col("--fg");g.font=F(600,32);g.fillText(fmtNum(conc)+(window.PK_LANG==="en"?" in company concessions":" titik di area konsesi perusahaan"),64,y+10);
+    const big=list.slice().sort((a,b)=>b.frp-a.frp)[0];if(big){g.fillText((window.PK_LANG==="en"?"Largest fire: ":"Api terbesar: ")+Math.round(big.frp)+(window.PK_LANG==="en"?" MW in ":" MW di ")+placeName(big),64,y+60)}}
   // footer
   g.fillStyle=col("--line");g.fillRect(64,H-110,952,2);
   g.fillStyle=col("--muted");g.font=F(500,26);g.fillText("pantau-karhutla.vercel.app",64,H-84);g.textAlign="right";g.fillText("Data: NASA FIRMS",1016,H-84);g.textAlign="left";
