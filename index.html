@@ -519,6 +519,7 @@ html.embed .layers,html.embed #chips{display:none}
 .embedbar a b{color:var(--accent)}
 html.embed .toolbar{right:230px}
 
+@media (max-width:400px){.status #statusMain{display:none}.status{gap:0;padding:9px}}
 /* ---------- Responsive ---------- */
 @media (max-width:1180px){:root{--side:380px}.brand p{display:none}}
 @media (max-width:860px){
@@ -539,7 +540,11 @@ html.embed .toolbar{right:230px}
 }
 @media (max-width:520px){
   .status .full{display:none}
-  .brand h1{font-size:21px}
+  .brand h1{font-size:17px}
+  .top-act{gap:6px}
+  .top-act .btn{padding:6px 8px}
+  .langbtn{min-width:0;font-size:12px}
+  .status{padding:5px 9px}
   #nearBtn{padding:7px 9px}
   #nearBtn .nb-t{display:none}
   .tabs{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
