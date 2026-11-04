@@ -361,7 +361,15 @@ renderInstall();
    9. TREN (arsip FIRMS VIIRS S-NPP sejak 2015) — data/trend.js dimuat saat tab dibuka
    ===================================================================== */
 let TR=null,trP=null,trProv="";
-function loadTrend(){if(TR)return Promise.resolve(TR);if(trP)return trP;trP=new Promise((res,rej)=>{const s=document.createElement("script");s.src="data/trend.js?v=20261104a";s.onload=()=>{TR=window.TREND_DATA||null;TR?res(TR):rej(new Error("kosong"))};s.onerror=()=>{trP=null;rej(new Error("gagal memuat"))};document.head.appendChild(s)});return trP}
+function loadTrend(){if(TR)return Promise.resolve(TR);if(trP)return trP;trP=new Promise((res,rej)=>{const s=document.createElement("script");s.src="data/trend.js?v=20261104b";s.onload=()=>{TR=decodeTrend(window.TREND_RAW);TR?res(TR):rej(new Error("kosong"))};s.onerror=()=>{trP=null;rej(new Error("gagal memuat"))};document.head.appendChild(s)});return trP}
+function decodeTrend(R){if(!R)return null;
+  const ym=(y0,m0,i)=>{const t=y0*12+(m0-1)+i;return Math.floor(t/12)+"-"+pad(t%12+1)};
+  const [Y0,M0]=R.m0.split("-").map(Number),[CY0,CM0]=R.cm0.split("-").map(Number);
+  const M={};for(const p in R.M){const o={};R.M[p].forEach((v,i)=>{if(v)o[ym(Y0,M0,i)]=v});M[p]=o}
+  const D={};const d0=Date.parse(R.start);R.D.forEach((v,i)=>{if(v)D[new Date(d0+i*864e5).toISOString().slice(0,10)]=v});
+  const comps=[...new Set((window.CONC_DATA?buildConc(window.CONC_DATA):CONC).map(s=>s.company))];const ok=comps.length===R.nComp;
+  const CY={},CM={};if(ok){R.CY.forEach(r=>{const o={};r.slice(1).forEach((v,i)=>{if(v)o[Y0+i]=v});CY[comps[r[0]]]=o});R.CM.forEach(r=>{const o={};r.slice(1).forEach((v,i)=>{if(v)o[ym(CY0,CM0,i)]=v});CM[comps[r[0]]]=o})}
+  return {start:R.start,asOf:R.asOf,spEnd:R.spEnd,M,D,CY,CM,gaps:R.gaps||[]}}
 const BLN3=BULAN.map(b=>b.slice(0,3));
 function trSeries(prov){ // {ym:n}
   if(prov)return TR.M[prov]||{};const o={};Object.values(TR.M).forEach(m=>{for(const k in m)o[k]=(o[k]||0)+m[k]});return o}
@@ -401,7 +409,7 @@ function renderTrend(){
   const rank=Object.entries(TR.CM).map(([c,o])=>[c,yms.reduce((a,k)=>a+(o[k]||0),0)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,15);
   const rmx=rank.length?rank[0][1]:1;
   const repYears=prevYears.slice(-10);
-  const repeat=Object.entries(TR.CY).map(([c,o])=>{const yrs=repYears.filter(y=>(o[y]||0)>=10);return {c,yrs,tot:repYears.reduce((a,y)=>a+(o[y]||0),0)}}).filter(x=>x.yrs.length>=6).sort((a,b)=>b.yrs.length-a.yrs.length||b.tot-a.tot).slice(0,15);
+  const repeat=Object.entries(TR.CY).map(([c,o])=>{const yrs=repYears.filter(y=>(o[y]||0)>=50);return {c,yrs,tot:repYears.reduce((a,y)=>a+(o[y]||0),0)}}).filter(x=>x.yrs.length>=6).sort((a,b)=>b.yrs.length-a.yrs.length||b.tot-a.tot).slice(0,15);
   const grp=c=>{const s=CONC.find(x=>x.company===c);return s&&s.group?s.group:(s&&s.cid&&window.COMPANY_PROFILES&&window.COMPANY_PROFILES[s.cid]?window.COMPANY_PROFILES[s.cid].group:"")};
   box.innerHTML=
    '<div class="sec"><div class="sortbar"><h2 style="flex:1">Tren titik api '+Y0+'–'+yNow+'</h2><select class="tsel" id="trProv" aria-label="Pilih wilayah"><option value="">Seluruh Indonesia</option>'+provs.map(p=>'<option'+(p===trProv?" selected":"")+'>'+esc(p)+'</option>').join("")+'</select></div>'+
@@ -416,8 +424,8 @@ function renderTrend(){
       {name:String(yNow),color:cv("--accent"),vals:thisY,w:3,dots:true}],{label:"Grafik jumlah titik api per bulan"})+
     '<div class="lgd"><span><i style="background:'+cv("--accent")+'"></i>'+yNow+'</span><span><i style="background:'+cv("--faint")+'"></i>Rata-rata '+prevYears.slice(-5)[0]+'–'+prevYears[prevYears.length-1]+'</span><span><i style="background:#c0504d"></i>2015 (kebakaran besar)</span><span><i style="background:#b88a00"></i>2019</span></div></div>'+
    (trProv?'':'<div class="sec"><h2>Konsesi dengan titik api terbanyak <small>12 bulan terakhir</small></h2><div class="rank">'+rank.map(([c,n],i)=>'<button type="button" data-tco="'+esc(c)+'"><span class="no">'+(i+1)+'</span><span><b>'+esc(c)+'</b><small>'+esc(grp(c)||"Grup tidak tercatat")+'</small><div class="bar" style="width:'+(n/rmx*100)+'%"></div></span><span class="n">'+fmtNum(n)+'</span></button>').join("")+'</div></div>'+
-    '<div class="sec"><h2>Terbakar berulang <small>'+repYears[0]+'–'+repYears[repYears.length-1]+'</small></h2><p class="lead" style="font-size:13px">Konsesi dengan minimal 10 deteksi titik api dalam setahun, terjadi di 6 tahun atau lebih dari 10 tahun terakhir.</p><div class="rank">'+repeat.map((x,i)=>'<button type="button" data-tco="'+esc(x.c)+'"><span class="no">'+(i+1)+'</span><span><b>'+esc(x.c)+'</b><small>'+esc(grp(x.c)||"Grup tidak tercatat")+'</small><div class="yrs">'+repYears.map(y=>'<i class="'+(x.yrs.includes(y)?"on":"")+'" title="'+y+': '+fmtNum(TR.CY[x.c][y]||0)+'"></i>').join("")+'</div></span><span class="n">'+x.yrs.length+' th</span></button>').join("")+'</div></div>')+
-   '<div class="sec"><p class="caveat">Sumber: arsip NASA FIRMS satelit VIIRS S-NPP (data standar s.d. '+TR.spEnd+', setelahnya data cepat/NRT), semua tingkat keyakinan, hanya titik di daratan provinsi Indonesia. Satu kebakaran bisa terdeteksi berkali-kali, jadi angka ini menunjukkan intensitas, bukan jumlah kejadian. Titik api di konsesi <b>tidak membuktikan</b> perusahaan sebagai penyebab. Data diperbarui sampai '+dNow+' '+BULAN[mNow-1]+' '+yNow+'.</p></div>';
+    '<div class="sec"><h2>Terbakar berulang <small>'+repYears[0]+'–'+repYears[repYears.length-1]+'</small></h2><p class="lead" style="font-size:13px">Konsesi dengan minimal 50 deteksi titik api dalam setahun, terjadi di 6 tahun atau lebih dari 10 tahun terakhir.</p><div class="rank">'+repeat.map((x,i)=>'<button type="button" data-tco="'+esc(x.c)+'"><span class="no">'+(i+1)+'</span><span><b>'+esc(x.c)+'</b><small>'+esc(grp(x.c)||"Grup tidak tercatat")+'</small><div class="yrs">'+repYears.map(y=>'<i class="'+(x.yrs.includes(y)?"on":"")+'" title="'+y+': '+fmtNum(TR.CY[x.c][y]||0)+'"></i>').join("")+'</div></span><span class="n">'+x.yrs.length+' th</span></button>').join("")+'</div></div>')+
+   '<div class="sec"><p class="caveat">Sumber: arsip NASA FIRMS satelit VIIRS S-NPP (data standar s.d. '+TR.spEnd+', setelahnya data cepat/NRT), semua tingkat keyakinan, hanya titik di daratan provinsi Indonesia. Satu kebakaran bisa terdeteksi berkali-kali, jadi angka ini menunjukkan intensitas, bukan jumlah kejadian. Titik api di konsesi <b>tidak membuktikan</b> perusahaan sebagai penyebab. Data diperbarui sampai '+dNow+' '+BULAN[mNow-1]+' '+yNow+'. Satelit S-NPP sempat tidak beroperasi pada 27 Juli–10 Agustus 2022 dan beberapa hari di 2023–2024, sehingga periode itu tidak tercatat.</p></div>';
   $("trProv").onchange=e=>{trProv=e.target.value;renderTrend()};
 }
 $("trenBox").addEventListener("click",e=>{const b=e.target.closest("[data-tco]");if(b)openCompany(b.dataset.tco)});
