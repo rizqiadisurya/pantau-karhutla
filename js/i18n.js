@@ -133,7 +133,7 @@ const D={
 "Gambar ringkasan":"Summary image","Bagikan":"Share","Unduh gambar":"Download image","Gambar mengikuti saringan yang sedang aktif (rentang waktu dan provinsi).":"The image follows the active filters (time range and province).","Data belum dimuat":"Data not loaded yet",
 "Peta angin belum bisa dimuat. Coba lagi nanti.":"The wind map could not be loaded. Please try again later.","Kualitas udara belum bisa dimuat. Coba lagi nanti.":"Air quality could not be loaded. Please try again later.","Prakiraan bahaya belum bisa dimuat. Coba lagi nanti.":"The fire danger forecast could not be loaded. Please try again later.","Prakiraan belum bisa dimuat.":"Forecast could not be loaded.",
 "Tidak ada data untuk lokasi ini.":"No data for this location.","Menghitung…":"Calculating…","Menghitung prakiraan bahaya kebakaran…":"Calculating fire danger forecast…","Memuat…":"Loading…",
-"Tren titik api":"Hotspot trends","Seluruh Indonesia ":"All of Indonesia","Tahun terparah":"Worst year","Per tahun":"Per year","deteksi satelit ":"satellite detections","Per bulan":"Per month","Konsesi dengan titik api terbanyak":"Concessions with the most hotspots","12 bulan terakhir":"last 12 months","Terbakar berulang":"Repeatedly burned",
+"Tren titik api":"Hotspot trends","Seluruh Indonesia ":"All of Indonesia","File sendiri":"Own file","Tahun terparah":"Worst year","Per tahun":"Per year","deteksi satelit ":"satellite detections","Per bulan":"Per month","Konsesi dengan titik api terbanyak":"Concessions with the most hotspots","12 bulan terakhir":"last 12 months","Terbakar berulang":"Repeatedly burned",
 "Konsesi dengan minimal 10 deteksi titik api dalam setahun, terjadi di 6 tahun atau lebih dari 10 tahun terakhir.":"Concessions with at least 10 hotspot detections in a year, in 6 or more of the last 10 years.","Riwayat titik api":"Hotspot history","per tahun":"per year","Memuat arsip…":"Loading archive…",
 "Arsip tren belum bisa dimuat. Coba muat ulang halaman.":"The trend archive could not be loaded. Try reloading the page.","Pilih wilayah":"Choose area",
 "Tidak ditemukan. Coba nama provinsi, kabupaten, atau perusahaan lain.":"Not found. Try another province, regency or company name.","Kabupaten":"Regency","Kota":"City",
@@ -148,6 +148,17 @@ const D={
 const N="([\\d.,]+)";
 const P=[
 [new RegExp("^"+N+" titik api$"),"$1 hotspots"],[new RegExp("^"+N+" titik$"),"$1 hotspots"],[new RegExp("^\\("+N+" titik\\)\\.$"),"($1 hotspots)."],[new RegExp("^"+N+" titik lain$"),"$1 others"],
+[/^terdeteksi di (.+?) dalam (.+?)\.( Terbanyak di)?( Ditampilkan sampai pukul (.+?)\.)?$/,(m,w,b,t,_,c)=>"detected "+(w.startsWith("konsesi ")?"in the concession of "+w.slice(8):"in "+w)+" in the "+wl(b)+"."+(t?" Most are in":"")+(c?" Shown up to "+c+".":"")],
+[/^\((.+) lokasi\)\.$/,"($1 locations)."],[/^(.+) lokasi api$/,"$1 fire locations"],[/^\(gabungan (.+) deteksi satelit\)$/,"(merged from $1 satellite detections)"],[/^Ditampilkan sampai pukul (.+)\.$/,"Shown up to $1."],
+[/^Tidak ada titik api di (.+?) dalam (.+?)\. Coba rentang 3 atau 7 hari\.$/,(m,w,b)=>"No hotspots "+(w.startsWith("konsesi ")?"in the concession of "+w.slice(8):"in "+w)+" in the "+wl(b)+". Try 3 or 7 days."],
+[/^(.+) · lokasi$/,(m,a)=>T(a)+" · locations"],
+[/^(.+) titik api VIIRS dalam (.+?)\. Halaman ini mengambil data baru otomatis setiap 15 menit; terakhir (.+?) \(pukul (.+?)\), berikutnya sekitar (\d+) menit lagi\. Deteksi satelit terbaru: (.+?)\. Satelit melintasi Indonesia sekitar pukul 12\.00–14\.00 dan 00\.00–02\.00 WIB\.$/,(m,a,b,c,d,e,f)=>a+" VIIRS hotspots in the "+wl(b)+". This page fetches new data automatically every 15 minutes; last "+c+" (at "+d+"), next in about "+e+" min. Latest satellite detection: "+f+". Satellites pass over Indonesia around 12:00–14:00 and 00:00–02:00 WIB."],
+[/^Menampilkan arsip deteksi satelit$/,"Showing archived satellite detections"],[/^(\w+, \d+ \w+ \d{4}) pukul (.+?)\. (.*)$/,(m,a,b,c)=>a+" at "+b+". "+T(c)],
+[/^Data live belum tersedia \((.+)\)\. Menampilkan arsip terakhir\.$/,"Live data not available yet ($1). Showing the latest archive."],
+[/^\*Kasus ISPA terkait asap karhutla per provinsi per (.+?) \((.+?) kasus\); total terbaru (.+?) kasus per (.+?)\. Jambi belum dirinci\. Penduduk Kaltim termasuk Kaltara, Papua dan Papua Barat termasuk provinsi pemekaran\. Sumber:$/,"*Smoke-related ISPA cases by province as of $1 ($2 cases); latest total $3 cases as of $4. Jambi not broken down yet. East Kalimantan population includes North Kalimantan; Papua and West Papua include the newly split provinces. Sources:"],
+[/^([\d.,]+) konsesi kebun sawit & HTI\.$/,"$1 oil palm & timber plantation concessions."],
+[/^\(himpunan data\), termasuk laporan WALHI (\d+) “(.+)”$/,"(dataset), including WALHI's $1 report “$2”"],[/^\(himpunan data\)(.*)$/,"(dataset)$1"],
+[/^Profil di IDX \((.+)\)$/,"Profile on IDX ($1)"],
 [/^terdeteksi di Indonesia dalam (.+?)\. Terbanyak di$/,(m,a)=>"detected in Indonesia in the "+wl(a)+". Most are in"],
 [/^Jumlah deteksi per (jam|\d+ jam) \(WIB\)$/,(m,a)=>"Detections per "+(a==="jam"?"hour":a.replace(" jam"," hours"))+" (WIB)"],[/^dalam (.+)$/,(m,a)=>"in the "+wl(a)],
 [/^Batas wilayah: Natural Earth · Titik api: NASA FIRMS(.*)$/,(m,a)=>"Boundaries: Natural Earth · Hotspots: NASA FIRMS"+a.replace("Gambut:","Peat:").replace("dkk.","et al.")],
@@ -210,6 +221,7 @@ function T(s){
   const lead=s.match(/^\s*/)[0],trail=s.match(/\s*$/)[0],t=s.trim();if(!t)return s;
   if(Object.prototype.hasOwnProperty.call(D,t))return lead+D[t]+trail;
   for(const [re,rep] of P){if(re.test(t)){if(rep===null)return s;return lead+t.replace(re,rep)+trail}}
+  if(/ · Grup /.test(t))return lead+t.replace(/ · Grup /g," · Group ")+trail;
   return s;
 }
 window.PK_T=T;
