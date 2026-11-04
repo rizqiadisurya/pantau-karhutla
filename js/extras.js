@@ -401,7 +401,7 @@ function renderTrend(){
   const cur=ySame(yNow);const pct=avgSame?Math.round((cur/avgSame-1)*100):0;
   const worstY=prevYears.slice().sort((a,b)=>yTot(b)-yTot(a))[0];
   const avg5=[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>{const ys=prevYears.slice(-5);return ys.reduce((a,y)=>a+(S[y+"-"+pad(m)]||0),0)/ys.length});
-  const thisY=[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>m<=mNow?(S[yNow+"-"+pad(m)]||0):null);
+  const thisY=[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>(m<mNow||(m===mNow&&dNow>=20))?(S[yNow+"-"+pad(m)]||0):null);
   const mx=Math.max(1,...years.map(yTot));
   const provs=Object.keys(TR.M).sort((a,b)=>a.localeCompare(b,"id"));
   // ranking (12 bulan terakhir)

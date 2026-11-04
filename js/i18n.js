@@ -147,6 +147,8 @@ const D={
 /* ---------- patterns (numbers, names, dates inside sentences) ---------- */
 const N="([\\d.,]+)";
 const P=[
+[/^Sumber: arsip NASA FIRMS satelit VIIRS S-NPP \(data standar s\.d\. (.+?), setelahnya data cepat\/NRT\), semua tingkat keyakinan, hanya titik di daratan provinsi Indonesia\. Satu kebakaran bisa terdeteksi berkali-kali, jadi angka ini menunjukkan intensitas, bukan jumlah kejadian\. Titik api di konsesi$/,"Source: NASA FIRMS VIIRS S-NPP archive (standard data to $1, near-real-time after that), all confidence levels, only points on Indonesian provincial land. One fire can be detected many times, so these figures show intensity, not the number of fires. A hotspot in a concession"],[/^perusahaan sebagai penyebab\. Data diperbarui sampai (.+?)\. Satelit S-NPP sempat tidak beroperasi pada 27 Juli–10 Agustus 2022 dan beberapa hari di 2023–2024, sehingga periode itu tidak tercatat\.$/,"the company caused it. Data updated to $1. The S-NPP satellite was out of service on 27 July–10 August 2022 and a few days in 2023–2024, so those periods are not recorded."],[/^tidak membuktikan$/,"does not prove"],
+[/^Tren titik api (\d+)–(\d+)$/,"Hotspot trends $1–$2"],
 [new RegExp("^"+N+" titik api$"),"$1 hotspots"],[new RegExp("^"+N+" titik$"),"$1 hotspots"],[new RegExp("^\\("+N+" titik\\)\\.$"),"($1 hotspots)."],[new RegExp("^"+N+" titik lain$"),"$1 others"],
 [/^terdeteksi di (.+?) dalam (.+?)\.( Terbanyak di)?( Ditampilkan sampai pukul (.+?)\.)?$/,(m,w,b,t,_,c)=>"detected "+(w.startsWith("konsesi ")?"in the concession of "+w.slice(8):"in "+w)+" in the "+wl(b)+"."+(t?" Most are in":"")+(c?" Shown up to "+c+".":"")],
 [/^\((.+) lokasi\)\.$/,"($1 locations)."],[/^(.+) lokasi api$/,"$1 fire locations"],[/^\(gabungan (.+) deteksi satelit\)$/,"(merged from $1 satellite detections)"],[/^Ditampilkan sampai pukul (.+)\.$/,"Shown up to $1."],
@@ -211,7 +213,7 @@ const P=[
 [/^berada di lahan gambut\. Api gambut bisa membara di bawah permukaan, sulit dipadamkan, dan menjadi sumber utama kabut asap\.$/,"are on peatland. Peat fires can smoulder underground, are hard to extinguish and are the main source of haze."],
 [/^(.+) titik api \((\d+)%\)$/,"$1 hotspots ($2%)"],
 [/^Hari ini$/,"Today"],[/^Hari ini (.*)$/,(m,a)=>"Today "+T(a)],[/^Besok (.*)$/,(m,a)=>"Tomorrow "+T(a)],
-[/^Sumber: arsip NASA FIRMS satelit VIIRS S-NPP \(data standar s\.d\. (.+?), setelahnya data cepat\/NRT\), semua tingkat keyakinan, hanya titik di daratan provinsi Indonesia\. Satu kebakaran bisa terdeteksi berkali-kali, jadi angka ini menunjukkan intensitas, bukan jumlah kejadian\. Titik api di konsesi$/,"Source: NASA FIRMS VIIRS S-NPP archive (standard data to $1, near-real-time after that), all confidence levels, only points on Indonesian provincial land. One fire can be detected many times, so these figures show intensity, not the number of fires. A hotspot in a concession"],[/^perusahaan sebagai penyebab\. Data diperbarui sampai (.+?)\. Satelit S-NPP sempat tidak beroperasi pada 27 Juli–10 Agustus 2022 dan beberapa hari di 2023–2024, sehingga periode itu tidak tercatat\.$/,"the company caused it. Data updated to $1. The S-NPP satellite was out of service on 27 July–10 August 2022 and a few days in 2023–2024, so those periods are not recorded."],[/^tidak membuktikan$/,"does not prove"],
+
 [/^Kalimantan|^Sumatera|^Sulawesi|^Jawa|^Papua|^Maluku|^Nusa Tenggara|^Bali|^Aceh|^Riau|^Jambi|^Bengkulu|^Lampung|^Banten|^Gorontalo|^DKI|^DI /,null]
 ];
 const CTX=[[".compass",{U:"N",T:"E",S:"S",B:"W"}],[".rstrip,.rtab td.c",{R:"L",S:"M",T:"H",E:"E"}]];
