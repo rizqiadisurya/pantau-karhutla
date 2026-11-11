@@ -1,5 +1,5 @@
 // Pantau Karhutla service worker: app shell offline, data selalu dari jaringan.
-const VERSION = "pk-20261104b";
+const VERSION = "pk-20261111a";
 const SHELL = ["/", "/favicon.svg", "/favicon-32.png", "/icon-192.png", "/site.webmanifest"];
 const STATIC_HOSTS = ["cdnjs.cloudflare.com", "fonts.googleapis.com", "fonts.gstatic.com"];
 
@@ -19,13 +19,13 @@ self.addEventListener("fetch", e => {
   if (!same && !STATIC_HOSTS.includes(url.hostname)) return;
   if (req.mode === "navigate") {
     // Network first for the page; fall back to the cached shell when offline.
-    e.respondWith(fetch(req).then(r => { const cp = r.clone(); caches.open(VERSION).then(c => c.put("/", cp)); return r; }).catch(() => caches.match("/")));
+    e.respondWith(fetch(req).then(r => { if (r.ok) { const cp = r.clone(); caches.open(VERSION).then(c => c.put("/", cp)); } return r; }).catch(() => caches.match("/").then(h => h || Response.error())));
     return;
   }
   // Static files: stale-while-revalidate.
   e.respondWith(caches.open(VERSION).then(async c => {
     const hit = await c.match(req);
-    const net = fetch(req).then(r => { if (r.ok || r.type === "opaque") c.put(req, r.clone()); return r; }).catch(() => hit);
+    const net = fetch(req).then(r => { if (r.ok && r.type !== "opaque") c.put(req, r.clone()); return r; }).catch(() => hit || Response.error());
     return hit || net;
   }));
 });

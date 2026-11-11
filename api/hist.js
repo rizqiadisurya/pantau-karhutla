@@ -5,7 +5,18 @@
 
 const AREA = "94,-12,142,7";
 
+const guard = require("./_guard");
+const crypto = require("crypto");
+
 async function handler(req, res) {
+  if (!guard(req, res, ["date", "range", "src", "avail"])) return;
+  // The archive endpoint is heavy on the FIRMS quota, so it is closed to the public.
+  // To rebuild data/trend.js, set HIST_TOKEN in Vercel and send it in the "x-hist-token" header.
+  const tok = process.env.HIST_TOKEN || "", sent = String(req.headers["x-hist-token"] || "");
+  if (!tok || sent.length !== tok.length || !crypto.timingSafeEqual(Buffer.from(sent), Buffer.from(tok))) {
+    res.status(404).json({ error: "Tidak ditemukan." });
+    return;
+  }
   const q = req.query || {};
   const key = process.env.FIRMS_MAP_KEY;
   if (!key) { res.status(503).json({ error: "FIRMS_MAP_KEY belum diatur di Vercel." }); return; }
@@ -13,7 +24,7 @@ async function handler(req, res) {
     if (q.avail) {
       const r = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv/${encodeURIComponent(key)}/all`);
       const t = await r.text();
-      res.setHeader("Cache-Control", "s-maxage=3600");
+      res.setHeader("Cache-Control", "private, no-store");
       res.status(r.ok ? 200 : 502).setHeader("Content-Type", "text/plain; charset=utf-8").send(t);
       return;
     }
@@ -36,8 +47,8 @@ async function handler(req, res) {
       if (!isFinite(la) || !isFinite(lo)) continue;
       out.push(la.toFixed(3) + "," + lo.toFixed(3) + "," + v[iDate] + "," + (iConf >= 0 ? String(v[iConf]).charAt(0) : "n"));
     }
-    const old = Date.parse(date) < Date.now() - 120 * 864e5;
-    res.setHeader("Cache-Control", old ? "public, s-maxage=31536000, max-age=86400" : "public, s-maxage=21600");
+    // Token-protected, so never cache at the shared edge (it would bypass the check).
+    res.setHeader("Cache-Control", "private, no-store");
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("X-Source", src);
     res.status(200).send(out.join("\n"));

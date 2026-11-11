@@ -8,7 +8,10 @@ const FIRE = "VIIRS_NOAA20_Thermal_Anomalies_375m_All";
 const SIZES = new Set([160, 320, 640]);
 const HALF = 0.3; // degrees around the point (~65 km box)
 
+const guard = require("./_guard");
+
 async function handler(req, res) {
+  if (!guard(req, res, ["lat", "lon", "date", "size", "fire"])) return;
   const q = req.query || {};
   const lat = parseFloat(q.lat), lon = parseFloat(q.lon);
   const size = parseInt(q.size || "320", 10);

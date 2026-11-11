@@ -4,7 +4,10 @@
 
 const LAYER = "VIIRS_NOAA20_CorrectedReflectance_TrueColor";
 
+const guard = require("./_guard");
+
 async function handler(req, res) {
+  if (!guard(req, res, ["z", "x", "y", "date"])) return;
   const q = req.query || {};
   const z = parseInt(q.z, 10), x = parseInt(q.x, 10), y = parseInt(q.y, 10);
   const date = String(q.date || "");

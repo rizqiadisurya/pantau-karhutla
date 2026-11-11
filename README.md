@@ -76,7 +76,7 @@ npx vercel --prod               # deploy ulang dengan kunci terpasang
 
 ## Memperbarui arsip tren
 
-`data/trend.js` dibangun dari `api/hist.js` (per 5 hari, VIIRS S-NPP). Jalankan pelan-pelan (±1 permintaan per 10 detik): kunci FIRMS punya batas transaksi per 10 menit, dan kalau terlampaui data live di situs ikut gagal sementara.
+`data/trend.js` dibangun dari `api/hist.js` (per 5 hari, VIIRS S-NPP). Endpoint ini **tertutup untuk publik**: isi `HIST_TOKEN` (teks acak panjang) di Vercel → Settings → Environment Variables, lalu kirim header `x-hist-token` saat memanggilnya. Hapus lagi variabel itu setelah selesai. Jalankan pelan-pelan (±1 permintaan per 10 detik): kunci FIRMS punya batas transaksi per 10 menit, dan kalau terlampaui data live di situs ikut gagal sementara.
 
 ## Catatan penting
 
@@ -84,3 +84,12 @@ npx vercel --prod               # deploy ulang dengan kunci terpasang
 - Titik panas di dalam konsesi berarti api terdeteksi di lahan berizin perusahaan tersebut, **bukan bukti** perusahaan itu penyebabnya.
 - Data konsesi sawit berasal dari 2012; pemilik sebagian konsesi mungkin sudah berganti.
 - Untuk titik live, pencocokan ke konsesi memakai batas yang disederhanakan, sehingga titik yang sangat dekat garis batas bisa meleset.
+
+## Keamanan
+
+- Kunci `FIRMS_MAP_KEY` hanya ada di Vercel (server), tidak pernah dikirim ke browser.
+- Fungsi `api/*` hanya menerima GET dan parameter yang dikenal (`api/_guard.js`), supaya tidak bisa dipakai untuk menghabiskan kuota FIRMS dengan parameter acak.
+- `api/hist.js` tertutup tanpa `HIST_TOKEN`.
+- Header keamanan (CSP, HSTS, nosniff, Referrer-Policy, Permissions-Policy) diatur di `vercel.json`.
+- Leaflet dari cdnjs dikunci dengan Subresource Integrity (SRI).
+- Aktifkan verifikasi dua langkah (2FA) di akun GitHub dan Vercel.

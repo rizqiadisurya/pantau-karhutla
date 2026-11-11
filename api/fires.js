@@ -31,7 +31,12 @@ function parseCsv(text) {
 
 const toMs = r => Date.parse(r[2] + "T" + r[3].slice(0, 2) + ":" + r[3].slice(2, 4) + ":00Z");
 
+const guard = require("./_guard");
+
 async function handler(req, res) {
+  if (!guard(req, res, ["days"])) return;
+  const rawDays = req.query && req.query.days;
+  if (rawDays !== undefined && !/^[1-7]$/.test(String(rawDays))) { res.status(400).json({ error: "Parameter days harus 1–7." }); return; }
   // ?days=1..7 → keep the last N×24 hours (fetch one extra day so the window is always full)
   const days = Math.min(7, Math.max(1, parseInt((req.query && req.query.days) || "1", 10) || 1));
   const DAYS = days + 1;
